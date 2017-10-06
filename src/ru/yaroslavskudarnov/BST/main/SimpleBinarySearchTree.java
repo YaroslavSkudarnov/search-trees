@@ -15,9 +15,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
         E payload;
 
-        Node(Node left, Node right, E payload) {
-            this.left = left;
-            this.right = right;
+        Node(E payload) {
             this.payload = payload;
         }
 
@@ -29,6 +27,39 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
             }
 
             return tmp;
+        }
+
+        int size() {
+            int size = 1;
+
+            size = left == null ? size : size + left.size();
+            size = right == null ? size : size + right.size();
+
+            return size;
+        }
+
+        boolean add(E e) {
+            int compare = payload.compareTo(e);
+
+            if (compare == 0) {
+                return false;
+            } else {
+                if (compare < 0) {
+                    if (right == null) {
+                        right = new Node(e);
+                        return true;
+                    } else {
+                        return right.add(e);
+                    }
+                } else {
+                    if (left == null) {
+                        left = new Node(e);
+                        return true;
+                    } else {
+                        return left.add(e);
+                    }
+                }
+            }
         }
     }
 
@@ -45,7 +76,12 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
     @Override
     public boolean add(E e) {
-        return super.add(e);
+        if (root == null) {
+            root = new Node(e);
+            return true;
+        } else {
+            return root.add(e);
+        }
     }
 
     @Override
@@ -55,7 +91,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
     @Override
     public Iterator<E> iterator() {
-        return new Iterator<E>() {
+        return new Iterator<>() {
             private Node currentNode = root.leftmostDescendant();
             private Node nextNode = null;
 
@@ -90,7 +126,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
                 if (nextNode == null) {
                     nextNode = getNext();
                 }
-                
+
                 if (nextNode == null) {
                     throw new NoSuchElementException();
                 } else {
@@ -105,6 +141,10 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
     @Override
     public int size() {
-        return 0;
+        if (root == null) {
+            return 0;
+        } else{
+            return root.size();
+        }
     }
 }
