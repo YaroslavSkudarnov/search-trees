@@ -71,6 +71,42 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
                 return left != null && left.contains(e);
             }
         }
+
+        boolean remove(E e, Node parent) {
+            int compare = payload.compareTo(e);
+
+            if (compare == 0) {
+                Node replacement;
+
+                if (left == null) {
+                    if (right == null) {
+                        replacement = null;
+                    } else {
+                        replacement = right;
+                    }
+                } else {
+                    if (right == null) {
+                        replacement = left;
+                    } else {
+                        replacement = parent.leftmostDescendant();
+                        SimpleBinarySearchTree.this.remove(replacement.payload);
+                        replacement.left = left; replacement.right = right;
+                    }
+                }
+
+                if (parent.left.payload.compareTo(e) == 0) {
+                    parent.left = replacement;
+                } else {
+                    parent.right = replacement;
+                }
+
+                return true;
+            } else if (compare < 0) {
+                return right != null && right.remove(e, this);
+            } else {
+                return left != null && left.remove(e, this);
+            }
+        }
     }
 
     private Node root;
@@ -81,7 +117,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
     @Override
     public boolean contains(Object o) {
-        if (o == null) {
+        if ((o == null) || (root == null)) {
             return false;
         } else {
             @SuppressWarnings("unchecked")
@@ -103,7 +139,23 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
     @Override
     public boolean remove(Object o) {
-        return super.remove(o);
+        if ((o == null) || (root == null)) {
+            return false;
+        } else {
+            @SuppressWarnings("unchecked")
+                E e = (E) o;
+
+            int compare = root.payload.compareTo(e);
+
+            if (compare == 0) {
+                root = null;
+                return true;
+            } else if (compare < 0) {
+                return root.right != null && root.right.remove(e, root);
+            } else {
+                return root.left != null && root.left.remove(e, root);
+            }
+        }
     }
 
     @Override
