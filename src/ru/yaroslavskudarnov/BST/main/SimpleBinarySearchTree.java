@@ -32,8 +32,8 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
         int size() {
             int size = 1;
 
-            size = left == null ? size : size + left.size();
-            size = right == null ? size : size + right.size();
+            size += left == null ? 0 : left.size();
+            size += right == null ? 0 : right.size();
 
             return size;
         }
@@ -61,6 +61,27 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
                 }
             }
         }
+
+        boolean contains(Object o) {
+            if (o == null) {
+                return false;
+            } else {
+                @SuppressWarnings("unchecked")
+                    E e = (E) o;
+                
+                int compare = payload.compareTo(e);
+
+                if (compare == 0) {
+                    return true;
+                } else {
+                    if (compare < 0) {
+                        return right != null && right.contains(e);
+                    } else {
+                        return left != null && left.contains(e);
+                    }
+                }
+            }
+        }
     }
 
     private Node root;
@@ -71,7 +92,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
     @Override
     public boolean contains(Object o) {
-        return super.contains(o);
+        return root.contains(o);
     }
 
     @Override
