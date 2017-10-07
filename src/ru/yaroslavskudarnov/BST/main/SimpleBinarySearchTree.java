@@ -43,21 +43,19 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
             if (compare == 0) {
                 return false;
-            } else {
-                if (compare < 0) {
-                    if (right == null) {
-                        right = new Node(e);
-                        return true;
-                    } else {
-                        return right.add(e);
-                    }
+            } else if (compare < 0) {
+                if (right == null) {
+                    right = new Node(e);
+                    return true;
                 } else {
-                    if (left == null) {
-                        left = new Node(e);
-                        return true;
-                    } else {
-                        return left.add(e);
-                    }
+                    return right.add(e);
+                }
+            } else {
+                if (left == null) {
+                    left = new Node(e);
+                    return true;
+                } else {
+                    return left.add(e);
                 }
             }
         }
@@ -73,12 +71,10 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
 
                 if (compare == 0) {
                     return true;
-                } else {
-                    if (compare < 0) {
+                } else if (compare < 0) {
                         return right != null && right.contains(e);
-                    } else {
-                        return left != null && left.contains(e);
-                    }
+                } else {
+                    return left != null && left.contains(e);
                 }
             }
         }
