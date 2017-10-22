@@ -18,11 +18,15 @@ public class TestSimpleBST {
         BinarySearchTree<Integer> tree = new SimpleBinarySearchTree<>();
 
         List<Integer> tmpList1 = List.of(1, 12, 3, -4, 5, 0, 6, 17, 8, -9, 10, 0);
-        tree.add(1); tree.add(3); tree.add(5);
         Assert.assertTrue(tree.addAll(tmpList1));
+        Assert.assertFalse(tree.add(1));
+        Assert.assertFalse(tree.add(3));
+        Assert.assertFalse(tree.add(5));
+        Assert.assertTrue(tree.add(7));
         Assert.assertFalse(tree.addAll(tmpList1));
         Assert.assertTrue(tree.containsAll(tmpList1));
-        Assert.assertFalse(tree.contains(-1)); Assert.assertFalse(tree.contains(2)); Assert.assertFalse(tree.contains(7));
+        Assert.assertFalse(tree.contains(-1)); Assert.assertFalse(tree.contains(2)); Assert.assertFalse(tree.contains(87));
+        Assert.assertTrue(tree.contains(12)); Assert.assertTrue(tree.contains(-9)); Assert.assertTrue(tree.contains(7));
 
         List<Integer> tmpList2 = List.of(1, 3, 5);
         tree.retainAll(tmpList2);
