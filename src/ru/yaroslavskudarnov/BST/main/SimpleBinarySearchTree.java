@@ -96,7 +96,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                     }
                 }
 
-                if (parent.left.payload.compareTo(e) == 0) {
+                if ((parent.left != null) && (parent.left.payload.compareTo(e) == 0)) {
                     parent.left = replacement;
                 } else {
                     parent.right = replacement;
@@ -163,8 +163,29 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
     @Override
     public Iterator<E> iterator() {
         return new Iterator<>() {
-            private Node currentNode = root.leftmostDescendant();
-            private Node nextNode = null;
+            private Node currentNode = null;
+            private Node nextNode = root.leftmostDescendant();
+
+            private Node getPrevious() {
+                Node tmp = root;
+                Node tmpResult = null;
+
+                while (tmp != null) {
+                    if (tmp.payload.compareTo(currentNode.payload) < 0) {
+                        tmpResult = tmp;
+
+                        tmp = tmp.right;
+                    } else {
+                        if (tmp.left != null) {
+                            tmp = tmp.left;
+                        } else {
+                            return tmpResult;
+                        }
+                    }
+                }
+
+                return tmpResult;
+            }
 
             private Node getNext() {
                 Node tmp = root;
@@ -176,7 +197,11 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
 
                         tmp = tmp.left;
                     } else {
-                        tmpResult = tmp.right;
+                        if (tmp.right != null) {
+                            tmp = tmp.right;
+                        } else {
+                            return tmpResult;
+                        }
                     }
                 }
 
@@ -206,6 +231,14 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                 }
 
                 return currentNode.payload;
+            }
+
+            @Override
+            public void remove() {
+                nextNode = getNext();
+                Node previousNode = getPrevious();
+                SimpleBinarySearchTree.this.remove(currentNode.payload);
+                currentNode = previousNode;
             }
         };
     }
