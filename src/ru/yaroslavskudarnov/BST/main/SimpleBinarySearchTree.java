@@ -31,6 +31,48 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             return tmp;
         }
 
+        private Node getPrevious() {
+            Node tmp = root;
+            Node tmpResult = null;
+
+            while (tmp != null) {
+                if (tmp.payload.compareTo(payload) < 0) {
+                    tmpResult = tmp;
+
+                    tmp = tmp.right;
+                } else {
+                    if (tmp.left != null) {
+                        tmp = tmp.left;
+                    } else {
+                        return tmpResult;
+                    }
+                }
+            }
+
+            return tmpResult;
+        }
+
+        private Node getNext() {
+            Node tmp = root;
+            Node tmpResult = null;
+
+            while (tmp != null) {
+                if (tmp.payload.compareTo(payload) > 0) {
+                    tmpResult = tmp;
+
+                    tmp = tmp.left;
+                } else {
+                    if (tmp.right != null) {
+                        tmp = tmp.right;
+                    } else {
+                        return tmpResult;
+                    }
+                }
+            }
+
+            return tmpResult;
+        }
+
         int size() {
             int size = 1;
 
@@ -166,52 +208,10 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             private Node currentNode = null;
             private Node nextNode = root.leftmostDescendant();
 
-            private Node getPrevious() {
-                Node tmp = root;
-                Node tmpResult = null;
-
-                while (tmp != null) {
-                    if (tmp.payload.compareTo(currentNode.payload) < 0) {
-                        tmpResult = tmp;
-
-                        tmp = tmp.right;
-                    } else {
-                        if (tmp.left != null) {
-                            tmp = tmp.left;
-                        } else {
-                            return tmpResult;
-                        }
-                    }
-                }
-
-                return tmpResult;
-            }
-
-            private Node getNext() {
-                Node tmp = root;
-                Node tmpResult = null;
-
-                while (tmp != null) {
-                    if (tmp.payload.compareTo(currentNode.payload) > 0) {
-                        tmpResult = tmp;
-
-                        tmp = tmp.left;
-                    } else {
-                        if (tmp.right != null) {
-                            tmp = tmp.right;
-                        } else {
-                            return tmpResult;
-                        }
-                    }
-                }
-
-                return tmpResult;
-            }
-
             @Override
             public boolean hasNext() {
                 if (nextNode == null) {
-                    nextNode = getNext();
+                    nextNode = currentNode.getNext();
                 }
 
                 return nextNode != null;
@@ -220,7 +220,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             @Override
             public E next() {
                 if (nextNode == null) {
-                    nextNode = getNext();
+                    nextNode = currentNode.getNext();
                 }
 
                 if (nextNode == null) {
