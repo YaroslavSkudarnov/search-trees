@@ -9,7 +9,9 @@ import java.util.NoSuchElementException;
  * Date: 10/2/2017
  * Time: 12:34 PM
  */
-public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends AbstractBinarySearchTree<E> {
+public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends BinarySearchTree<E> {
+    public SimpleBinarySearchTree() {}
+
     class Node {
         Node left, right;
 
@@ -112,7 +114,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Abs
     private Node root;
 
     public SimpleBinarySearchTree(Collection<E> collection) {
-        this.addAll(collection);
+        super(collection);
     }
 
     @Override
