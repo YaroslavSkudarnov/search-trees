@@ -5,6 +5,7 @@ import org.junit.Test;
 import ru.yaroslavskudarnov.BST.main.BinarySearchTree;
 import ru.yaroslavskudarnov.BST.main.SimpleBinarySearchTree;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,5 +36,22 @@ public class TestSimpleBST {
 
         tree.removeAll(tmpList2);
         Assert.assertFalse(tree.contains(1)); Assert.assertFalse(tree.contains(3)); Assert.assertFalse(tree.contains(5));
+    }
+
+    @Test
+    public void bigRandomTest() {
+        for (int i = 0; i < 10; ++i) {
+            List<Integer> firstList = new ArrayList<>(), secondList = new ArrayList<>();
+            for (int j = 0; j < 100000; ++j) {
+                firstList.add((int) (Math.random() * 200000)); secondList.add((int) (Math.random() * 200000));
+            }
+            List<Integer> thirdList = new ArrayList<>(firstList);
+
+            BinarySearchTree<Integer> tree = new SimpleBinarySearchTree<>(); tree.addAll(firstList); tree.retainAll(secondList); firstList.retainAll(secondList);
+            Assert.assertTrue(firstList.containsAll(tree)); Assert.assertTrue(tree.containsAll(firstList));
+
+            tree = new SimpleBinarySearchTree<>(thirdList); tree.removeAll(secondList); thirdList.removeAll(secondList);
+            Assert.assertTrue(thirdList.containsAll(tree)); Assert.assertTrue(tree.containsAll(thirdList));
+        }
     }
 }
