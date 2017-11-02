@@ -20,6 +20,11 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
         Node(E payload) {
             this.payload = payload;
         }
+        Node(Node left, Node right, E payload) {
+            this.left = left;
+            this.right = right;
+            this.payload = payload;
+        }
 
         Node leftmostDescendant() {
             Node tmp = this;
@@ -132,9 +137,15 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                     if (right == null) {
                         replacement = left;
                     } else {
-                        replacement = parent.leftmostDescendant();
-                        SimpleBinarySearchTree.this.remove(replacement.payload);
-                        replacement.left = left; replacement.right = right;
+                        Node next = getNext();
+
+                        if (next == null) {
+                            replacement = left;
+                        } else {
+                            replacement = next;
+                            SimpleBinarySearchTree.this.remove(replacement.payload);
+                            replacement = new Node(left, right, replacement.payload);
+                        }
                     }
                 }
 
@@ -192,7 +203,21 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             int compare = root.payload.compareTo(e);
 
             if (compare == 0) {
-                root = null;
+                E tmpPayload = null;
+
+                if (root.getNext() != null) {
+                    tmpPayload = root.getNext().payload;
+                } else if (root.getPrevious() != null) {
+                    tmpPayload = root.getPrevious().payload;
+                } else {
+                    root = null;
+                }
+
+                if (root != null) {
+                    remove(tmpPayload);
+                    root.payload = tmpPayload;
+                }
+
                 return true;
             } else if (compare < 0) {
                 return root.right != null && root.right.remove(e, root);
@@ -211,7 +236,11 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             @Override
             public boolean hasNext() {
                 if (nextNode == null) {
-                    nextNode = currentNode.getNext();
+                    if (currentNode == null) {
+                        return false;
+                    } else {
+                        nextNode = currentNode.getNext();
+                    }
                 }
 
                 return nextNode != null;
@@ -219,11 +248,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
 
             @Override
             public E next() {
-                if (nextNode == null) {
-                    nextNode = currentNode.getNext();
-                }
-
-                if (nextNode == null) {
+                if (!hasNext()) {
                     throw new NoSuchElementException();
                 } else {
                     currentNode = nextNode;
@@ -235,10 +260,13 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
 
             @Override
             public void remove() {
-                nextNode = getNext();
-                Node previousNode = getPrevious();
-                SimpleBinarySearchTree.this.remove(currentNode.payload);
-                currentNode = previousNode;
+                if (currentNode == null) {
+                    throw new NoSuchElementException();
+                } else {
+                    nextNode = currentNode.getNext();
+                    SimpleBinarySearchTree.this.remove(currentNode.payload);
+                    currentNode = null;
+                }
             }
         };
     }
