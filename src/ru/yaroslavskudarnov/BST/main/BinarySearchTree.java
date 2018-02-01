@@ -13,7 +13,7 @@ import java.util.Collection;
 public abstract class BinarySearchTree<E extends Comparable<? super E>> extends SearchTree<E> {
     protected class BinarySearchTreeNode extends TreeNode {
         private BinarySearchTreeNode left, right;
-        private E payload;
+        protected E payload;
 
         BinarySearchTreeNode(E payload) {
             this.payload = payload;

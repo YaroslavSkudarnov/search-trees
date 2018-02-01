@@ -2,7 +2,6 @@ package ru.yaroslavskudarnov.BST.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yaroslavskudarnov.BST.main.BinarySearchTree;
 import ru.yaroslavskudarnov.BST.main.SimpleBinarySearchTree;
 
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import java.util.List;
 public class TestSimpleBST {
     @Test
     public void smallTestAddContainsAndRemove() {
-        BinarySearchTree<Integer> tree = new SimpleBinarySearchTree<>();
+        SimpleBinarySearchTree<Integer> tree = new SimpleBinarySearchTree<>();
 
         List<Integer> tmpList1 = List.of(1, 12, 3, -4, 5, 0, 6, 17, 8, -9, 10, 0);
         Assert.assertTrue(tree.addAll(tmpList1));
@@ -47,7 +46,7 @@ public class TestSimpleBST {
             }
             List<Integer> thirdList = new ArrayList<>(firstList);
 
-            BinarySearchTree<Integer> tree = new SimpleBinarySearchTree<>(); tree.addAll(firstList); tree.retainAll(secondList); firstList.retainAll(secondList);
+            SimpleBinarySearchTree<Integer> tree = new SimpleBinarySearchTree<>(); tree.addAll(firstList); tree.retainAll(secondList); firstList.retainAll(secondList);
             Assert.assertTrue(firstList.containsAll(tree)); Assert.assertTrue(tree.containsAll(firstList));
 
             tree = new SimpleBinarySearchTree<>(thirdList); tree.removeAll(secondList); thirdList.removeAll(secondList);
