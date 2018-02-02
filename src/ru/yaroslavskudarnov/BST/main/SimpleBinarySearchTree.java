@@ -22,7 +22,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             root = new BinarySearchTreeNode(e);
             return true;
         } else {
-            return root.addToSubtree(e);
+            return addToSubtree(e, root);
         }
     }
 
@@ -34,7 +34,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             @SuppressWarnings("unchecked")
                 E e = (E) o;
 
-            return root.removeFromSubtree(e, null);
+            return removeFromSubtree(e, root, null);
         }
     }
 
@@ -49,7 +49,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                     if (currentNode == null) {
                         return false;
                     } else {
-                        nextNode = currentNode.getNext(root);
+                        nextNode = currentNode.getNext();
                     }
                 }
 
@@ -73,8 +73,8 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                 if (currentNode == null) {
                     throw new NoSuchElementException();
                 } else {
-                    nextNode = currentNode.getNext(root);
-                    root.removeFromSubtree(currentNode.payload,  null);
+                    nextNode = currentNode.getNext();
+                    removeFromSubtree(currentNode.payload, root, null);
                     if (root.payload == null) {
                         root = null;
                     }
