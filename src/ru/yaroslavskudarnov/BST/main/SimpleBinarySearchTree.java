@@ -1,7 +1,5 @@
 package ru.yaroslavskudarnov.BST.main;
 
-import ru.yaroslavskudarnov.BST.core.TreeNode;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -20,7 +18,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
     
     @Override
     public boolean add(E e) {
-        if (root.isEmpty()) {
+        if (isEmpty()) {
             root = new BinarySearchTreeNode(e);
             return true;
         } else {
@@ -36,32 +34,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             @SuppressWarnings("unchecked")
                 E e = (E) o;
 
-            return root.removeFromSubtree(e);
-
-            /*int compare = root.compareTo(e);
-
-            if (compare == 0) {
-                E tmpPayload = null;
-
-                if (root.getNext(root) != null) {
-                    tmpPayload = root.getNext(root).payload;
-                } else if (root.getPrevious(root) != null) {
-                    tmpPayload = root.getPrevious(root).payload;
-                } else {
-                    root = null;
-                }
-
-                if (root != null) {
-                    remove(tmpPayload);
-                    root.payload = tmpPayload;
-                }
-
-                return true;
-            } else if (compare < 0) {
-                return root.right != null && removeFromSubtree(root.right, e, root);
-            } else {
-                return root.left != null && removeFromSubtree(root.left, e, root);
-            }*/
+            return root.removeFromSubtree(e, null);
         }
     }
 
@@ -101,7 +74,10 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                     throw new NoSuchElementException();
                 } else {
                     nextNode = currentNode.getNext(root);
-                    root.removeFromSubtree(currentNode.payload);
+                    root.removeFromSubtree(currentNode.payload,  null);
+                    if (root.payload == null) {
+                        root = null;
+                    }
                     currentNode = null;
                 }
             }

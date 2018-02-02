@@ -121,7 +121,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
             }
         }
 
-        boolean removeFromSubtree(E e) {
+        boolean removeFromSubtree(E e, BinarySearchTreeNode parent) {
             int compare = compareTo(e);
 
             if (compare == 0) {
@@ -149,7 +149,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
                     }
                 }
 
-                /*if (parent == null) {
+                if (parent == null) {
                     if (replacement == null) {
                         this.payload = null;
                     } else {
@@ -161,19 +161,13 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
                     } else {
                         parent.right = replacement;
                     }
-                }*/
-
-                if (replacement == null) {
-                    this.payload = null;
-                } else {
-                    replaceContent(replacement);
                 }
 
                 return true;
             } else if (compare < 0) {
-                return right != null && right.removeFromSubtree(e);
+                return right != null && right.removeFromSubtree(e, this);
             } else {
-                return left != null && left.removeFromSubtree(e);
+                return left != null && left.removeFromSubtree(e, this);
             }
         }
 
@@ -182,17 +176,11 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
             this.left = replacement.left;
             this.right = replacement.right;
         }
-
-        public boolean isEmpty() {
-            return root.payload != null;
-        }
     }
 
     protected BinarySearchTreeNode root;
 
-    protected BinarySearchTree() {
-        root = new BinarySearchTreeNode(null);
-    }
+    protected BinarySearchTree() {}
 
     public BinarySearchTree(Collection<E> collection) {
         super(collection);
@@ -200,11 +188,15 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
     
     @Override
     public int size() {
-        if (root == null) {
+        if (isEmpty()) {
             return 0;
-        } else{
+        } else {
             return root.subtreeSize();
         }
+    }
+
+    public boolean isEmpty() {
+        return root == null;
     }
     
     @Override
