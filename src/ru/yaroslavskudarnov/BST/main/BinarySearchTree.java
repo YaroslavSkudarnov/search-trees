@@ -139,7 +139,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
         }
     }
 
-    boolean addToSubtree(E e, BinarySearchTreeNode node) {
+    protected boolean addToSubtree(E e, BinarySearchTreeNode node) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
@@ -161,7 +161,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
         }
     }
 
-    boolean removeFromSubtree(E e, BinarySearchTreeNode node, BinarySearchTreeNode parent) {
+    protected boolean removeFromSubtree(E e, BinarySearchTreeNode node, BinarySearchTreeNode parent) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
