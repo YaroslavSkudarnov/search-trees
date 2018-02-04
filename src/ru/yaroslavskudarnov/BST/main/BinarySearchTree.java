@@ -10,32 +10,30 @@ import java.util.Collection;
  * Date: 12/17/2017
  * Time: 11:41 PM
  */
-public abstract class BinarySearchTree<E extends Comparable<? super E>> extends SearchTree<E> {
-    protected class BinarySearchTreeNode extends TreeNode {
-        protected BinarySearchTreeNode left, right;
+public abstract class BinarySearchTree<E extends Comparable<? super E>, N extends BinarySearchTree<E, N>.BinarySearchTreeNode> extends SearchTree<E> {
+    abstract class BinarySearchTreeNode implements TreeNode {
+        protected N left, right;
         protected E payload;
 
         BinarySearchTreeNode(E payload) {
             this.payload = payload;
         }
-        BinarySearchTreeNode(BinarySearchTreeNode left, BinarySearchTreeNode right, E payload) {
-            this.left = left;
-            this.right = right;
-            this.payload = payload;
+        BinarySearchTreeNode(N node) {
+            replaceContent(node);
         }
 
-        BinarySearchTreeNode leftmostDescendant() {
-            BinarySearchTreeNode tmp = this;
-
-            while (tmp.left != null) {
-                tmp = tmp.left;
-            }
-
-            return tmp;
+        protected int compareTo(E e) {
+            return payload.compareTo(e);
         }
 
-        BinarySearchTreeNode getPrevious() {
-            BinarySearchTreeNode tmp = root, tmpResult = null;
+        protected void replaceContent(N replacement) {
+            this.payload = replacement.payload;
+            this.left = replacement.left;
+            this.right = replacement.right;
+        }
+
+        N getPrevious() {
+            N tmp = root, tmpResult = null;
 
             while (tmp != null) {
                 if (tmp.payload.compareTo(payload) < 0) {
@@ -54,8 +52,8 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
             return tmpResult;
         }
 
-        BinarySearchTreeNode getNext() {
-            BinarySearchTreeNode tmp = root, tmpResult = null;
+        N getNext() {
+            N tmp = root, tmpResult = null;
 
             while (tmp != null) {
                 if (tmp.payload.compareTo(payload) > 0) {
@@ -74,18 +72,19 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
             return tmpResult;
         }
 
-        protected int compareTo(E e) {
-            return payload.compareTo(e);
-        }
+        N leftmostDescendant() {
+            @SuppressWarnings("unchecked")
+            N tmp = (N) this;
 
-        protected void replaceContent(BinarySearchTreeNode replacement) {
-            this.payload = replacement.payload;
-            this.left = replacement.left;
-            this.right = replacement.right;
+            while (tmp.left != null) {
+                tmp = tmp.left;
+            }
+
+            return (N) tmp;
         }
     }
 
-    protected BinarySearchTreeNode root;
+    protected N root;
 
     protected BinarySearchTree() {}
 
@@ -93,49 +92,12 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
         super(collection);
     }
 
-    private int subtreeSize(BinarySearchTreeNode node) {
+    protected int subtreeSize(BinarySearchTreeNode node) {
         int size = 1;
 
         size += node.left == null ? 0 : subtreeSize(node.left);
         size += node.right == null ? 0 : subtreeSize(node.right);
 
         return size;
-    }
-
-    @Override
-    public int size() {
-        if (isEmpty()) {
-            return 0;
-        } else {
-            return subtreeSize(root);
-        }
-    }
-
-    public boolean isEmpty() {
-        return root == null;
-    }
-    
-    @Override
-    public boolean contains(Object o) {
-        if ((o == null) || (root == null)) {
-            return false;
-        } else {
-            @SuppressWarnings("unchecked")
-                E e = (E) o;
-
-            return subtreeContains(e, root);
-        }
-    }
-
-    private boolean subtreeContains(E e, BinarySearchTreeNode node) {
-        int compare = node.compareTo(e);
-
-        if (compare == 0) {
-            return true;
-        } else if (compare < 0) {
-            return node.right != null && subtreeContains(e, node.right);
-        } else {
-            return node.left != null && subtreeContains(e, node.left);
-        }
     }
 }

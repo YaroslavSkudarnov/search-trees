@@ -9,17 +9,29 @@ import java.util.NoSuchElementException;
  * Date: 10/2/2017
  * Time: 12:34 PM
  */
-public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends BinarySearchTree<E> {
+public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends BinarySearchTree<E, SimpleBinarySearchTree.SimpleBinarySearchTreeNode> {
+    class SimpleBinarySearchTreeNode extends BinarySearchTree<E, SimpleBinarySearchTreeNode>.BinarySearchTreeNode {
+        SimpleBinarySearchTreeNode(E payload) {
+            super(payload);
+        }
+
+        SimpleBinarySearchTreeNode(SimpleBinarySearchTreeNode node) {
+            super(node);
+        }
+    }
+
+    protected SimpleBinarySearchTreeNode root;
+
     public SimpleBinarySearchTree() {}
 
     public SimpleBinarySearchTree(Collection<E> collection) {
         super(collection);
     }
-    
+
     @Override
     public boolean add(E e) {
         if (isEmpty()) {
-            root = new BinarySearchTreeNode(e);
+            root = new SimpleBinarySearchTreeNode(e);
             return true;
         } else {
             return addToSubtree(e, root);
@@ -39,9 +51,34 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
     }
 
     @Override
+    public int size() {
+        if (isEmpty()) {
+            return 0;
+        } else {
+            return subtreeSize(root);
+        }
+    }
+
+    public boolean isEmpty() {
+        return root == null;
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        if ((o == null) || (root == null)) {
+            return false;
+        } else {
+            @SuppressWarnings("unchecked")
+            E e = (E) o;
+
+            return subtreeContains(e, root);
+        }
+    }
+
+    @Override
     public Iterator<E> iterator() {
         return new Iterator<>() {
-            private BinarySearchTreeNode currentNode, nextNode = root.leftmostDescendant();
+            private SimpleBinarySearchTreeNode currentNode, nextNode = root.leftmostDescendant();
 
             @Override
             public boolean hasNext() {
@@ -91,14 +128,14 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             return false;
         } else if (compare < 0) {
             if (node.right == null) {
-                node.right = new BinarySearchTreeNode(e);
+                node.right = new SimpleBinarySearchTreeNode(e);
                 return true;
             } else {
                 return addToSubtree(e, node.right);
             }
         } else {
             if (node.left == null) {
-                node.left = new BinarySearchTreeNode(e);
+                node.left = new SimpleBinarySearchTreeNode(e);
                 return true;
             } else {
                 return addToSubtree(e, node.left);
@@ -106,11 +143,11 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
         }
     }
 
-    private boolean removeFromSubtree(E e, BinarySearchTreeNode node, BinarySearchTreeNode parent) {
+    private boolean removeFromSubtree(E e, SimpleBinarySearchTreeNode node, SimpleBinarySearchTreeNode parent) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
-            BinarySearchTreeNode replacement;
+            SimpleBinarySearchTreeNode replacement;
 
             if (node.left == null) {
                 if (node.right == null) {
@@ -122,14 +159,14 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                 if (node.right == null) {
                     replacement = node.left;
                 } else {
-                    BinarySearchTreeNode next = node.getNext();
+                    SimpleBinarySearchTreeNode next = node.getNext();
 
                     if (next == null) {
                         replacement = node.left;
                     } else {
                         replacement = next;
                         SimpleBinarySearchTree.this.remove(replacement.payload);
-                        replacement = new BinarySearchTreeNode(node.left, node.right, replacement.payload);
+                        replacement = new SimpleBinarySearchTreeNode(node);
                     }
                 }
             }
@@ -154,5 +191,25 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
         } else {
             return node.left != null && removeFromSubtree(e, node.left, node);
         }
+    }
+
+    private boolean subtreeContains(E e, BinarySearchTreeNode node) {
+        int compare = node.compareTo(e);
+
+        if (compare == 0) {
+            return true;
+        } else if (compare < 0) {
+            return node.right != null && subtreeContains(e, node.right);
+        } else {
+            return node.left != null && subtreeContains(e, node.left);
+        }
+    }
+
+    protected int subtreeHeight(BinarySearchTreeNode node) {
+        if (node == null) {
+            return 0;
+        }
+
+        return Math.max(subtreeHeight(node.left), subtreeHeight(node.right)) + 1;
     }
 }

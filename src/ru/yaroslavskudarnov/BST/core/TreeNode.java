@@ -5,5 +5,5 @@ package ru.yaroslavskudarnov.BST.core;
  * Date: 11/20/2017
  * Time: 1:31 PM
  */
-public abstract class TreeNode {
+public interface TreeNode {
 }

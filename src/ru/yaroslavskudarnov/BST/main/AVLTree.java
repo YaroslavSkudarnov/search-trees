@@ -8,7 +8,20 @@ import java.util.Collection;
  * Time: 1:18 PM
  */
 public class AVLTree<E extends Comparable<? super E>> extends SimpleBinarySearchTree<E> {
-    private class AVL
+    private class AVLTreeNode extends BinarySearchTreeNode {
+        protected BinarySearchTreeNode left, right;
+        private int balance;
+
+        AVLTreeNode(E payload) {
+            super(payload);
+            this.balance = 0;
+        }
+
+        AVLTreeNode(BinarySearchTreeNode left, BinarySearchTreeNode right, E payload, int balance) {
+            super(left);
+            this.balance = balance;
+        }
+    }
 
     public AVLTree() {}
 
@@ -61,7 +74,7 @@ public class AVLTree<E extends Comparable<? super E>> extends SimpleBinarySearch
         }
     }
 
-    private void minorLeftRotation(BinarySearchTreeNode node, BinarySearchTreeNode parent) {
+    private void minorLeftRotation(AVLTreeNode node, AVLTreeNode parent) {
         BinarySearchTreeNode newSubRoot = node.right;
 
         if (parent == null) {
@@ -78,7 +91,7 @@ public class AVLTree<E extends Comparable<? super E>> extends SimpleBinarySearch
         newSubRoot.left = node;
     }
 
-    private boolean addToSubtree(E e, BinarySearchTreeNode node, BinarySearchTreeNode parent) {
+    private boolean addToSubtree(E e, AVLTreeNode node, AVLTreeNode parent) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
@@ -86,6 +99,7 @@ public class AVLTree<E extends Comparable<? super E>> extends SimpleBinarySearch
         } else if (compare < 0) {
             if (node.right == null) {
                 node.right = new BinarySearchTreeNode(e);
+                node.
                 return true;
             } else {
                 boolean result = addToSubtree(e, node.right, node);
