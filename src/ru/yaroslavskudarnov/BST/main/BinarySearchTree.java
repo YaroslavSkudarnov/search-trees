@@ -205,7 +205,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
 
             return true;
         } else if (compare < 0) {
-            return node.right != null && removeFromSubtree(e, node.left, node);
+            return node.right != null && removeFromSubtree(e, node.right, node);
         } else {
             return node.left != null && removeFromSubtree(e, node.left, node);
         }
