@@ -12,7 +12,7 @@ import java.util.Collection;
  */
 public abstract class BinarySearchTree<E extends Comparable<? super E>> extends SearchTree<E> {
     protected class BinarySearchTreeNode extends TreeNode {
-        private BinarySearchTreeNode left, right;
+        protected BinarySearchTreeNode left, right;
         protected E payload;
 
         BinarySearchTreeNode(E payload) {
@@ -74,11 +74,11 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
             return tmpResult;
         }
 
-        private int compareTo(E e) {
+        protected int compareTo(E e) {
             return payload.compareTo(e);
         }
 
-        private void replaceContent(BinarySearchTreeNode replacement) {
+        protected void replaceContent(BinarySearchTreeNode replacement) {
             this.payload = replacement.payload;
             this.left = replacement.left;
             this.right = replacement.right;
@@ -136,78 +136,6 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>> extends 
             return node.right != null && subtreeContains(e, node.right);
         } else {
             return node.left != null && subtreeContains(e, node.left);
-        }
-    }
-
-    protected boolean addToSubtree(E e, BinarySearchTreeNode node) {
-        int compare = node.compareTo(e);
-
-        if (compare == 0) {
-            return false;
-        } else if (compare < 0) {
-            if (node.right == null) {
-                node.right = new BinarySearchTreeNode(e);
-                return true;
-            } else {
-                return addToSubtree(e, node.right);
-            }
-        } else {
-            if (node.left == null) {
-                node.left = new BinarySearchTreeNode(e);
-                return true;
-            } else {
-                return addToSubtree(e, node.left);
-            }
-        }
-    }
-
-    protected boolean removeFromSubtree(E e, BinarySearchTreeNode node, BinarySearchTreeNode parent) {
-        int compare = node.compareTo(e);
-
-        if (compare == 0) {
-            BinarySearchTreeNode replacement;
-
-            if (node.left == null) {
-                if (node.right == null) {
-                    replacement = null;
-                } else {
-                    replacement = node.right;
-                }
-            } else {
-                if (node.right == null) {
-                    replacement = node.left;
-                } else {
-                    BinarySearchTreeNode next = node.getNext();
-
-                    if (next == null) {
-                        replacement = node.left;
-                    } else {
-                        replacement = next;
-                        BinarySearchTree.this.remove(replacement.payload);
-                        replacement = new BinarySearchTreeNode(node.left, node.right, replacement.payload);
-                    }
-                }
-            }
-
-            if (parent == null) {
-                if (replacement == null) {
-                    node.payload = null;
-                } else {
-                    node.replaceContent(replacement);
-                }
-            } else {
-                if ((parent.left != null) && (parent.left.compareTo(e) == 0)) {
-                    parent.left = replacement;
-                } else {
-                    parent.right = replacement;
-                }
-            }
-
-            return true;
-        } else if (compare < 0) {
-            return node.right != null && removeFromSubtree(e, node.right, node);
-        } else {
-            return node.left != null && removeFromSubtree(e, node.left, node);
         }
     }
 }
