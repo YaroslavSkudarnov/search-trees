@@ -7,12 +7,12 @@ import java.util.Collection;
  * Date: 11/3/2017
  * Time: 1:18 PM
  */
-public class AVLSearchTree<E extends Comparable<? super E>> extends SimpleBinarySearchTree<E> {
+public class AVLTree<E extends Comparable<? super E>> extends SimpleBinarySearchTree<E> {
     private class AVL
 
-    public AVLSearchTree() {}
+    public AVLTree() {}
 
-    public AVLSearchTree(Collection<E> collection) {
+    public AVLTree(Collection<E> collection) {
         super(collection);
     }
 
