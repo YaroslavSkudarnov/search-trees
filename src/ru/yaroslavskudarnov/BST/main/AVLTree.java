@@ -8,7 +8,7 @@ import java.util.Collection;
  * Time: 1:18 PM
  */
 public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E, AVLTree<E>.AVLTreeNode> {
-    private class AVLTreeNode extends BinarySearchTreeNode {
+    class AVLTreeNode extends BinarySearchTree<E, AVLTreeNode>.BinarySearchTreeNode {
         private int balance;
 
         AVLTreeNode(E payload) {
@@ -39,42 +39,17 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
     }
 
     @Override
-    public boolean remove(Object o) {
-        if ((o == null) || (root == null)) {
-            return false;
-        } else {
-            @SuppressWarnings("unchecked")
-            E e = (E) o;
+    protected AVLTreeNode initNode(E e) {
+        return new AVLTreeNode(e);
+    }
 
-            int compare = root.payload.compareTo(e);
-
-            if (compare == 0) {
-                E tmpPayload = null;
-
-                if (root.getNext() != null) {
-                    tmpPayload = root.getNext().payload;
-                } else if (root.getPrevious() != null) {
-                    tmpPayload = root.getPrevious().payload;
-                } else {
-                    root = null;
-                }
-
-                if (root != null) {
-                    remove(tmpPayload);
-                    root.payload = tmpPayload;
-                }
-
-                return true;
-            } else if (compare < 0) {
-                return root.right != null && root.right.remove(e, root);
-            } else {
-                return root.left != null && root.left.remove(e, root);
-            }
-        }
+    @Override
+    protected boolean removeFromSubtree(E e, AVLTreeNode subtree, AVLTreeNode parent) {
+        return false;
     }
 
     private void minorLeftRotation(AVLTreeNode node, AVLTreeNode parent) {
-        BinarySearchTreeNode newSubRoot = node.right;
+        AVLTreeNode newSubRoot = node.right;
 
         if (parent == null) {
             root = newSubRoot;
@@ -90,14 +65,14 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         newSubRoot.left = node;
     }
 
-    private boolean addToSubtree(E e, AVLTreeNode node, AVLTreeNode parent) {
+    protected boolean addToSubtree(E e, AVLTreeNode node, AVLTreeNode parent) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
             return false;
         } else if (compare < 0) {
             if (node.right == null) {
-                node.right = new BinarySearchTreeNode(e);
+                node.right = new AVLTreeNode(e);
                 node.
                 return true;
             } else {
@@ -118,7 +93,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
         } else {
             if (node.left == null) {
-                node.left = new BinarySearchTreeNode(e);
+                node.left = new AVLTreeNode(e);
                 return true;
             } else {
                 boolean result = addToSubtree(e, node.left, node);

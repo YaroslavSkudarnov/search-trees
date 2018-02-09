@@ -24,7 +24,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
         super(collection);
     }
 
-    protected boolean addToSubtree(E e, SimpleBinarySearchTreeNode node) {
+    protected boolean addToSubtree(E e, SimpleBinarySearchTreeNode node, SimpleBinarySearchTreeNode parent) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
@@ -34,14 +34,14 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                 node.right = new SimpleBinarySearchTreeNode(e);
                 return true;
             } else {
-                return addToSubtree(e, node.right);
+                return addToSubtree(e, node.right, null);
             }
         } else {
             if (node.left == null) {
                 node.left = new SimpleBinarySearchTreeNode(e);
                 return true;
             } else {
-                return addToSubtree(e, node.left);
+                return addToSubtree(e, node.left, null);
             }
         }
     }

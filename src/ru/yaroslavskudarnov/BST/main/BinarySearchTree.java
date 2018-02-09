@@ -146,11 +146,11 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
             root = initNode(e);
             return true;
         } else {
-            return addToSubtree(e, root);
+            return addToSubtree(e, root, null);
         }
     }
 
-    protected abstract boolean addToSubtree(E e, N subtree);
+    protected abstract boolean addToSubtree(E e, N subtree, N parent);
 
     protected abstract N initNode(E e);
 
