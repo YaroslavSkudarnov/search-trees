@@ -7,9 +7,8 @@ import java.util.Collection;
  * Date: 11/3/2017
  * Time: 1:18 PM
  */
-public class AVLTree<E extends Comparable<? super E>> extends SimpleBinarySearchTree<E> {
+public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E, AVLTree<E>.AVLTreeNode> {
     private class AVLTreeNode extends BinarySearchTreeNode {
-        protected BinarySearchTreeNode left, right;
         private int balance;
 
         AVLTreeNode(E payload) {
@@ -17,8 +16,8 @@ public class AVLTree<E extends Comparable<? super E>> extends SimpleBinarySearch
             this.balance = 0;
         }
 
-        AVLTreeNode(BinarySearchTreeNode left, BinarySearchTreeNode right, E payload, int balance) {
-            super(left);
+        AVLTreeNode(AVLTreeNode node, int balance) {
+            super(node);
             this.balance = balance;
         }
     }
@@ -32,7 +31,7 @@ public class AVLTree<E extends Comparable<? super E>> extends SimpleBinarySearch
     @Override
     public boolean add(E e) {
         if (root == null) {
-            root = new BinarySearchTreeNode(e);
+            root = new AVLTreeNode(e);
             return true;
         } else {
             return addToSubtree(e, root, null);
