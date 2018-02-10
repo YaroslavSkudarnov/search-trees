@@ -79,6 +79,10 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         @SuppressWarnings("unchecked")
         N tmp = node;
 
+        if (node == null) {
+            return null;
+        }
+
         while (tmp.left != null) {
             tmp = tmp.left;
         }
