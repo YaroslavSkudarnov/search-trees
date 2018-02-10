@@ -58,6 +58,10 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
     @Test
     public void smallRandomTest() {
         randomTest(10, 5);
+
+        long start = System.currentTimeMillis();
         randomTest(5, 50000);
+        long end = System.currentTimeMillis();
+        System.out.println("big tests took " + (end - start) + " milliseconds to run!");
     }
 }
