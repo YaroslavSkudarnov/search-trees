@@ -253,6 +253,20 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
         }
 
+        if (parent != null) {
+            compare = parent.compareTo(e);
+
+            if (compare > 0) {
+                if (parent.left.balance == 0) {
+                    indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
+                }
+            } else if (compare < 0) {
+                if (parent.right.balance == 0) {
+                    indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
+                }
+            }
+        }
+
         if (node.balance == 0) {
             indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
         }
