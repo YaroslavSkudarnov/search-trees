@@ -154,7 +154,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         }
     }
 
-    protected abstract boolean addToSubtree(E e, N subtree, N parent);
+    protected abstract boolean addToSubtree(E e, N node, N parent);
 
     protected abstract N initNode(E e);
 
@@ -166,11 +166,11 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
             @SuppressWarnings("unchecked")
             E e = (E) o;
 
-            return removeFromSubtree(e, root, null);
+            return root != null && removeFromSubtree(e, root, null);
         }
     }
 
-    protected abstract boolean removeFromSubtree(E e, N subtree, N parent);
+    protected abstract boolean removeFromSubtree(E e, N node, N parent);
 
     @Override
     public Iterator<E> iterator() {
@@ -208,7 +208,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
                     throw new NoSuchElementException();
                 } else {
                     nextNode = getNext(currentNode);
-                    removeFromSubtree(currentNode.payload, root, null);
+                    BinarySearchTree.this.remove(currentNode.payload);
                     if (root.payload == null) {
                         root = null;
                     }

@@ -1,6 +1,7 @@
 package ru.yaroslavskudarnov.BST.main;
 
 import java.util.Collection;
+import java.util.Stack;
 
 /**
  * User: Skudarnov Yaroslav
@@ -22,13 +23,14 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         }
     }
 
-    private boolean keepRebalancing;
+    private Stack<Boolean> indicatorsOfNecessityOfRebalancing;
 
     public AVLTree() {
+        indicatorsOfNecessityOfRebalancing = new Stack<>();
     }
 
     public AVLTree(Collection<E> collection) {
-        super(collection);
+        super(collection); indicatorsOfNecessityOfRebalancing = new Stack<>();
     }
 
     @Override
@@ -37,10 +39,25 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             root = new AVLTreeNode(e);
             return true;
         } else {
-            keepRebalancing = true;
+            indicatorsOfNecessityOfRebalancing.push(true);
             boolean result = addToSubtree(e, root, null);
-            keepRebalancing = false;
+            indicatorsOfNecessityOfRebalancing.pop();
 
+            return result;
+        }
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        if (o == null) {
+            return false;
+        } else {
+            @SuppressWarnings("unchecked")
+            E e = (E) o;
+
+            indicatorsOfNecessityOfRebalancing.push(true);
+            boolean result = root != null && removeFromSubtree(e, root, null);
+            indicatorsOfNecessityOfRebalancing.pop();
             return result;
         }
     }
@@ -51,8 +68,65 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
     }
 
     @Override
-    protected boolean removeFromSubtree(E e, AVLTreeNode subtree, AVLTreeNode parent) {
-        return false;
+    protected boolean removeFromSubtree(E e, AVLTreeNode node, AVLTreeNode parent) {
+        int compare = node.compareTo(e);
+
+        if (compare == 0) {
+            AVLTreeNode replacement;
+
+            if (node.left == null) {
+                if (node.right == null) {
+                    replacement = null;
+                } else {
+                    replacement = node.right;
+                }
+            } else {
+                if (node.right == null) {
+                    replacement = node.left;
+                } else {
+                    AVLTreeNode next = getNext(node);
+
+                    if (next == null) {
+                        replacement = node.left;
+                    } else {
+                        replacement = next;
+                        AVLTree.this.remove(replacement.payload);
+                        replacement.left = node.left; replacement.right = node.right;
+                        replacement.balance = node.balance;
+                    }
+                }
+            }
+
+            if (parent == null) {
+                if (replacement == null) {
+                    node.payload = null;
+                } else {
+                    node.replaceContent(replacement);
+                }
+            } else {
+                if ((parent.left != null) && (parent.left.compareTo(e) == 0)) {
+                    parent.left = replacement;
+                } else {
+                    parent.right = replacement;
+                }
+            }
+
+            return true;
+        }
+
+        boolean result;
+
+        if (compare < 0) {
+            result = node.right != null && removeFromSubtree(e, node.right, node);
+        } else {
+            result = node.left != null && removeFromSubtree(e, node.left, node);
+        }
+
+        if (indicatorsOfNecessityOfRebalancing.peek() && result) {
+            updateBalanceAfterChangingSubtree(node, parent, -1, -1);
+        }
+
+        return result;
     }
 
     private void minorLeftRotation(AVLTreeNode node, AVLTreeNode parent) {
@@ -110,9 +184,11 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
 
         if (compare == 0) {
             return false;
-        } else if (compare < 0) {
-            boolean result;
+        }
 
+        boolean result;
+
+        if (compare < 0) {
             if (node.right == null) {
                 node.right = new AVLTreeNode(e);
                 node.balance -= 1;
@@ -121,15 +197,11 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             } else {
                 result = addToSubtree(e, node.right, node);
 
-                if (keepRebalancing && result) {
-                    updateBalanceAfterAddingToRightSubtree(node, parent);
+                if (indicatorsOfNecessityOfRebalancing.peek() && result) {
+                    updateBalanceAfterChangingSubtree(node, parent, 1, -1);
                 }
             }
-
-            return result;
         } else {
-            boolean result;
-
             if (node.left == null) {
                 node.left = new AVLTreeNode(e);
                 node.balance += 1;
@@ -138,43 +210,54 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             } else {
                 result = addToSubtree(e, node.left, node);
 
-                if (keepRebalancing && result) {
-                    updateBalanceAfterAddingToLeftSubtree(node, parent);
+                if (indicatorsOfNecessityOfRebalancing.peek() && result) {
+                    updateBalanceAfterChangingSubtree(node, parent, 1, 1);
                 }
             }
-
-            return result;
         }
-    }
-
-    private void updateBalanceAfterAddingToLeftSubtree(AVLTreeNode node, AVLTreeNode parent) {
-        node.balance += 1;
 
         if (node.balance == 0) {
-            keepRebalancing = false;
+            indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
         }
 
-        if (node.balance == 2) {
-            if (node.left.balance == -1) {
-                majorRightRotation(node, parent);
+        return result;
+    }
+
+    /**
+     * Updates balance of current node. To be invoked after changing one of its subtrees.
+     * @param node current node
+     * @param parent its parent
+     * @param changeInNumberOfNodes +1 if this is invoked after adding new node, -1 if after deleting existing
+     * @param subtreeChanged +1 if left, -1 if right
+     */
+    private void updateBalanceAfterChangingSubtree(AVLTreeNode node, AVLTreeNode parent, int changeInNumberOfNodes, int subtreeChanged) {
+        node.balance += changeInNumberOfNodes * subtreeChanged;
+
+        if (node.balance != 0) {
+            if ((changeInNumberOfNodes * subtreeChanged) > 0) {
+                rightRotationsIfNecessary(node, parent); //if we added a node in the left subtree or deleted it from the right subtree
             } else {
-                minorRightRotation(node, parent);
+                leftRotationsIfNecessary(node, parent);  //if we added a node in the right subtree or deleted it from the left subtree
             }
         }
     }
 
-    private void updateBalanceAfterAddingToRightSubtree(AVLTreeNode node, AVLTreeNode parent) {
-        node.balance -= 1;
-
-        if (node.balance == 0) {
-            keepRebalancing = false;
-        }
-
+    private void leftRotationsIfNecessary(AVLTreeNode node, AVLTreeNode parent) {
         if (node.balance == -2) {
             if (node.right.balance == 1) {
                 majorLeftRotation(node, parent);
             } else {
                 minorLeftRotation(node, parent);
+            }
+        }
+    }
+
+    private void rightRotationsIfNecessary(AVLTreeNode node, AVLTreeNode parent) {
+        if (node.balance == 2) {
+            if (node.left.balance == -1) {
+                majorRightRotation(node, parent);
+            } else {
+                minorRightRotation(node, parent);
             }
         }
     }
