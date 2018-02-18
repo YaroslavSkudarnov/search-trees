@@ -17,6 +17,12 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             this.balance = 0;
         }
 
+        @Override
+        protected void replaceContent(AVLTreeNode replacement) {
+            super.replaceContent(replacement);
+            this.balance = replacement.balance;
+        }
+
         AVLTreeNode(AVLTreeNode node, int balance) {
             super(node);
             this.balance = balance;
