@@ -58,11 +58,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
             SimpleBinarySearchTreeNode replacement;
 
             if (node.left == null) {
-                if (node.right == null) {
-                    replacement = null;
-                } else {
-                    replacement = node.right;
-                }
+                replacement = node.right;
             } else {
                 if (node.right == null) {
                     replacement = node.left;
