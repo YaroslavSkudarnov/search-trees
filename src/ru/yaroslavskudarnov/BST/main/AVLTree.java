@@ -71,6 +71,8 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
     protected boolean removeFromSubtree(E e, AVLTreeNode node, AVLTreeNode parent) {
         int compare = node.compareTo(e);
 
+        boolean result;
+
         if (compare == 0) {
             AVLTreeNode replacement;
 
@@ -107,12 +109,8 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                 }
             }
 
-            return true;
-        }
-
-        boolean result;
-
-        if (compare < 0) {
+            result = true;
+        } else if (compare < 0) {
             result = node.right != null && removeFromSubtree(e, node.right, node);
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {
@@ -126,7 +124,19 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
         }
 
-        checkForNecessityOfStopRebalancing(e, parent);
+        if (parent != null) {
+            compare = parent.compareTo(e);
+
+            if (compare > 0) {
+                if ((parent.left != null) && (Math.abs(parent.left.balance) == 1)) {
+                    indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
+                }
+            } else if (compare < 0) {
+                if ((parent.right != null) && (Math.abs(parent.right.balance) == 1)) {
+                    indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
+                }
+            }
+        }
 
         return result;
     }
@@ -251,13 +261,6 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
         }
 
-        checkForNecessityOfStopRebalancing(e, parent);
-
-        return result;
-    }
-
-    private void checkForNecessityOfStopRebalancing(E e, AVLTreeNode parent) {
-        int compare;
         if (parent != null) {
             compare = parent.compareTo(e);
 
@@ -271,6 +274,8 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                 }
             }
         }
+
+        return result;
     }
 
     /**
