@@ -97,6 +97,8 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                         AVLTree.this.remove(replacement.payload);
                         replacement.left = node.left; replacement.right = node.right;
                         replacement.balance = node.balance;
+
+                        indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
                     }
                 }
             }
@@ -108,12 +110,18 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                     node.replaceContent(replacement);
                 }
             } else {
-                if ((parent.compareTo(e) > 0) && (parent.left != null) && (parent.left.compareTo(e) == 0)) { //first condition
+                if ((parent.compareTo(e) > 0) && (parent.left != null) && (parent.left.compareTo(e) == 0)) {
                     parent.left = replacement;
                 } else if ((parent.compareTo(e) < 0) && (parent.right != null) && (parent.right.compareTo(e) == 0)) {
                     parent.right = replacement;
                 } else {
-                    indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
+                    parent = findParent(e);
+
+                    if (parent.compareTo(e) < 0) {
+                        parent.right = replacement;
+                    } else {
+                        parent.left = replacement;
+                    }
                 }
             }
 

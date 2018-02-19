@@ -90,6 +90,28 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         return tmp;
     }
 
+    protected N findParent(E e) {
+        N parent, node;
+
+        parent = null;
+        node = root;
+
+        while (node != null) {
+            if (node.compareTo(e) == 0) {
+                return parent;
+            }
+
+            parent = node;
+            if (node.compareTo(e) > 0) {
+                node = node.left;
+            } else {
+                node = node.right;
+            }
+        }
+
+        return parent;
+    }
+
     protected N root;
 
     protected BinarySearchTree() {}
