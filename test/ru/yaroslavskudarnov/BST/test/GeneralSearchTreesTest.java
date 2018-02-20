@@ -4,8 +4,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import ru.yaroslavskudarnov.BST.main.BinarySearchTree;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: Skudarnov Yaroslav
@@ -43,31 +44,31 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
         long timeElapsed = 0;
 
         for (int i = 0; i < times; ++i) {
-            List<Integer> firstList = new ArrayList<>(), secondList = new ArrayList<>();
+            Set<Integer> firstSet = new HashSet<>(), secondSet = new HashSet<>();
             for (int j = 0; j < elems; ++j) {
-                firstList.add((int) (Math.random() * 2 * elems)); secondList.add((int) (Math.random() * 2 * elems));
+                firstSet.add((int) (Math.random() * 2 * elems)); secondSet.add((int) (Math.random() * 2 * elems));
             }
-            List<Integer> thirdList = new ArrayList<>(firstList);
+            Set<Integer> thirdSet = new HashSet<>(firstSet);
 
             T tree = getTree();
 
             long start = System.currentTimeMillis();
-            tree.addAll(firstList); tree.retainAll(secondList);
+            tree.addAll(firstSet); tree.retainAll(secondSet);
             long end = System.currentTimeMillis();
             timeElapsed += end - start;
 
-            firstList.retainAll(secondList);
-            Assert.assertTrue(firstList.containsAll(tree)); Assert.assertTrue(tree.containsAll(firstList));
+            firstSet.retainAll(secondSet);
+            Assert.assertTrue(firstSet.containsAll(tree)); Assert.assertTrue(tree.containsAll(firstSet));
 
             tree = getTree();
 
             start = System.currentTimeMillis();
-            tree.addAll(thirdList); tree.removeAll(secondList);
+            tree.addAll(thirdSet); tree.removeAll(secondSet);
             end = System.currentTimeMillis();
             timeElapsed += end - start;
 
-            thirdList.removeAll(secondList);
-            Assert.assertTrue(thirdList.containsAll(tree)); Assert.assertTrue(tree.containsAll(thirdList));
+            thirdSet.removeAll(secondSet);
+            Assert.assertTrue(thirdSet.containsAll(tree)); Assert.assertTrue(tree.containsAll(thirdSet));
         }
 
         return timeElapsed;
