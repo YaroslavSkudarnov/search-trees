@@ -39,7 +39,9 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
 
     protected abstract T getTree();
 
-    private void randomTest(int times, int elems) {
+    private long randomTest(int times, int elems) {
+        long timeElapsed = 0;
+
         for (int i = 0; i < times; ++i) {
             List<Integer> firstList = new ArrayList<>(), secondList = new ArrayList<>();
             for (int j = 0; j < elems; ++j) {
@@ -47,21 +49,41 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
             }
             List<Integer> thirdList = new ArrayList<>(firstList);
 
-            T tree = getTree(); tree.addAll(firstList); tree.retainAll(secondList); firstList.retainAll(secondList);
+            T tree = getTree();
+
+            long start = System.currentTimeMillis();
+            tree.addAll(firstList); tree.retainAll(secondList);
+            long end = System.currentTimeMillis();
+            timeElapsed += end - start;
+
+            firstList.retainAll(secondList);
             Assert.assertTrue(firstList.containsAll(tree)); Assert.assertTrue(tree.containsAll(firstList));
 
-            tree = getTree(); tree.addAll(thirdList); tree.removeAll(secondList); thirdList.removeAll(secondList);
+            tree = getTree();
+
+            start = System.currentTimeMillis();
+            tree.addAll(thirdList); tree.removeAll(secondList);
+            end = System.currentTimeMillis();
+            timeElapsed += end - start;
+
+            thirdList.removeAll(secondList);
             Assert.assertTrue(thirdList.containsAll(tree)); Assert.assertTrue(tree.containsAll(thirdList));
         }
+
+        return timeElapsed;
     }
 
     @Test
     public void smallRandomTest() {
-        randomTest(10, 5);
+        randomTest(10, 10);
+    }
 
-        long start = System.currentTimeMillis();
-        randomTest(5, 50000);
-        long end = System.currentTimeMillis();
-        System.out.println("big tests took " + (end - start) + " milliseconds to run!");
+    @Test
+    public void bigRandomTests() {
+        long timeElapsed;
+        for (int i = 1; i <= 10; ++i) {
+            timeElapsed = randomTest(5, i * 10000);
+            System.out.println("all the insertions and deletions in big tests with " + i * 10000 + " elements took " + timeElapsed + " milliseconds!");
+        }
     }
 }
