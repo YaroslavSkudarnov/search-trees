@@ -82,7 +82,12 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
     @Test
     public void bigRandomTests() {
         long timeElapsed;
+
         for (int i = 1; i <= 10; ++i) {
+            randomTest(15, i * 10000); //to warmup the JVM
+        }
+
+        for (int i = 1; i <= 20; ++i) {
             timeElapsed = randomTest(5, i * 10000);
             System.out.println("all the insertions and deletions in big tests with " + i * 10000 + " elements took " + timeElapsed + " milliseconds!");
         }
