@@ -12,9 +12,10 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
     class AVLTreeNode extends BinarySearchTree<E, AVLTreeNode>.BinarySearchTreeNode {
         private int balance;
 
-        AVLTreeNode(E payload) {
+        AVLTreeNode(E payload, AVLTreeNode parent) {
             super(payload);
             this.balance = 0;
+            this.parent = parent;
         }
 
         @Override
@@ -42,11 +43,11 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
     @Override
     public boolean add(E e) {
         if (root == null) {
-            root = new AVLTreeNode(e);
+            root = new AVLTreeNode(e, null);
             return true;
         } else {
             indicatorsOfNecessityOfRebalancing.push(true);
-            boolean result = addToSubtree(e, root, null);
+            boolean result = addToSubtree(e, root);
             indicatorsOfNecessityOfRebalancing.pop();
 
             return result;
@@ -62,7 +63,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             E e = (E) o;
 
             indicatorsOfNecessityOfRebalancing.push(true);
-            boolean result = root != null && removeFromSubtree(e, root, null);
+            boolean result = root != null && removeFromSubtree(e, root);
             indicatorsOfNecessityOfRebalancing.pop();
             return result;
         }
@@ -70,14 +71,16 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
 
     @Override
     protected AVLTreeNode initNode(E e) {
-        return new AVLTreeNode(e);
+        return new AVLTreeNode(e, null);
     }
 
     @Override
-    protected boolean removeFromSubtree(E e, AVLTreeNode node, AVLTreeNode parent) {
+    protected boolean removeFromSubtree(E e, AVLTreeNode node) {
         int compare = node.compareTo(e);
 
         boolean result;
+
+        AVLTreeNode parent = node.parent;
 
         if (compare == 0) {
             AVLTreeNode replacement;
@@ -96,7 +99,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                         replacement = next;
                         AVLTree.this.remove(replacement.payload);
                         replacement.left = node.left; replacement.right = node.right;
-                        replacement.balance = node.balance;
+                        replacement.balance = node.balance; replacement.parent = parent;
 
                         indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
                     }
@@ -115,7 +118,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                 } else if ((parent.compareTo(e) < 0) && (parent.right != null) && (parent.right.compareTo(e) == 0)) {
                     parent.right = replacement;
                 } else {
-                    parent = findParent(e);
+                    //parent = findParent(e);
 
                     if (parent.compareTo(e) < 0) {
                         parent.right = replacement;
@@ -123,17 +126,21 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                         parent.left = replacement;
                     }
                 }
+
+                if (replacement != null) {
+                    replacement.parent = parent;
+                }
             }
 
             result = true;
         } else if (compare < 0) {
-            result = node.right != null && removeFromSubtree(e, node.right, node);
+            result = node.right != null && removeFromSubtree(e, node.right);
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {
                 rebalanceAfterChangingSubtreeIfNecessary(node, parent, -1, -1);
             }
         } else {
-            result = node.left != null && removeFromSubtree(e, node.left, node);
+            result = node.left != null && removeFromSubtree(e, node.left);
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {
                 rebalanceAfterChangingSubtreeIfNecessary(node, parent, -1, 1);
@@ -170,7 +177,12 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
         }
 
+        newSubRoot.parent = parent;
         node.right = newSubRoot.left;
+        if (node.right != null) {
+            node.right.parent = node;
+        }
+        node.parent = newSubRoot;
         newSubRoot.left = node;
     }
 
@@ -202,7 +214,12 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
         }
 
+        newSubRoot.parent = parent;
         node.left = newSubRoot.right;
+        if (node.left != null) {
+            node.left.parent = node;
+        }
+        node.parent = newSubRoot;
         newSubRoot.right = node;
     }
 
@@ -244,7 +261,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         nextSubRoot.balance = 0;
     }
 
-    protected boolean addToSubtree(E e, AVLTreeNode node, AVLTreeNode parent) {
+    protected boolean addToSubtree(E e, AVLTreeNode node) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
@@ -253,12 +270,14 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
 
         boolean result;
 
+        AVLTreeNode parent = node.parent;
+
         if (compare < 0) {
             if (node.right == null) {
-                node.right = new AVLTreeNode(e);
+                node.right = new AVLTreeNode(e, node);
                 result = true;
             } else {
-                result = addToSubtree(e, node.right, node);
+                result = addToSubtree(e, node.right);
             }
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {
@@ -266,10 +285,10 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
         } else {
             if (node.left == null) {
-                node.left = new AVLTreeNode(e);
+                node.left = new AVLTreeNode(e, node);
                 result = true;
             } else {
-                result = addToSubtree(e, node.left, node);
+                result = addToSubtree(e, node.left);
             }
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {

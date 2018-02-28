@@ -13,7 +13,7 @@ import java.util.NoSuchElementException;
  */
 public abstract class BinarySearchTree<E extends Comparable<? super E>, N extends BinarySearchTree<E, N>.BinarySearchTreeNode> extends SearchTree<E> {
     public class BinarySearchTreeNode {
-        protected N left, right;
+        protected N left, right, parent;
         protected E payload;
 
         protected BinarySearchTreeNode(E payload) {
@@ -32,6 +32,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
             this.payload = replacement.payload;
             this.left = replacement.left;
             this.right = replacement.right;
+            this.parent = replacement.parent;
         }
     }
 
@@ -55,7 +56,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         return tmpResult;
     }
 
-    N getNext(N node) {
+    N getNext(N node) { //TODO: rewrite using node.parent
         N tmp = root, tmpResult = null;
 
         while (tmp != null) {
@@ -88,28 +89,6 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         }
 
         return tmp;
-    }
-
-    protected N findParent(E e) {
-        N parent, node;
-
-        parent = null;
-        node = root;
-
-        while (node != null) {
-            if (node.compareTo(e) == 0) {
-                return parent;
-            }
-
-            parent = node;
-            if (node.compareTo(e) > 0) {
-                node = node.left;
-            } else {
-                node = node.right;
-            }
-        }
-
-        return parent;
     }
 
     protected N root;
@@ -172,11 +151,11 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
             root = initNode(e);
             return true;
         } else {
-            return addToSubtree(e, root, null);
+            return addToSubtree(e, root);
         }
     }
 
-    protected abstract boolean addToSubtree(E e, N node, N parent);
+    protected abstract boolean addToSubtree(E e, N node);
 
     protected abstract N initNode(E e);
 
@@ -188,11 +167,11 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
             @SuppressWarnings("unchecked")
             E e = (E) o;
 
-            return root != null && removeFromSubtree(e, root, null);
+            return root != null && removeFromSubtree(e, root);
         }
     }
 
-    protected abstract boolean removeFromSubtree(E e, N node, N parent);
+    protected abstract boolean removeFromSubtree(E e, N node);
 
     @Override
     public Iterator<E> iterator() {

@@ -9,8 +9,8 @@ import java.util.Collection;
  */
 public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends BinarySearchTree<E, SimpleBinarySearchTree<E>.SimpleBinarySearchTreeNode> {
     class SimpleBinarySearchTreeNode extends BinarySearchTree<E, SimpleBinarySearchTreeNode>.BinarySearchTreeNode {
-        SimpleBinarySearchTreeNode(E payload) {
-            super(payload);
+        SimpleBinarySearchTreeNode(E payload, SimpleBinarySearchTreeNode parent) {
+            super(payload); this.parent = parent;
         }
 
         SimpleBinarySearchTreeNode(SimpleBinarySearchTreeNode node) {
@@ -24,35 +24,37 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
         super(collection);
     }
 
-    protected boolean addToSubtree(E e, SimpleBinarySearchTreeNode node, SimpleBinarySearchTreeNode parent) {
+    protected boolean addToSubtree(E e, SimpleBinarySearchTreeNode node) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
             return false;
         } else if (compare < 0) {
             if (node.right == null) {
-                node.right = new SimpleBinarySearchTreeNode(e);
+                node.right = new SimpleBinarySearchTreeNode(e, node);
                 return true;
             } else {
-                return addToSubtree(e, node.right, null);
+                return addToSubtree(e, node.right);
             }
         } else {
             if (node.left == null) {
-                node.left = new SimpleBinarySearchTreeNode(e);
+                node.left = new SimpleBinarySearchTreeNode(e, node);
                 return true;
             } else {
-                return addToSubtree(e, node.left, null);
+                return addToSubtree(e, node.left);
             }
         }
     }
 
     @Override
     protected SimpleBinarySearchTreeNode initNode(E e) {
-        return new SimpleBinarySearchTreeNode(e);
+        return new SimpleBinarySearchTreeNode(e, null);
     }
 
-    protected boolean removeFromSubtree(E e, SimpleBinarySearchTreeNode node, SimpleBinarySearchTreeNode parent) {
+    protected boolean removeFromSubtree(E e, SimpleBinarySearchTreeNode node) {
         int compare = node.compareTo(e);
+
+        SimpleBinarySearchTreeNode parent = node.parent;
 
         if (compare == 0) {
             SimpleBinarySearchTreeNode replacement;
@@ -91,9 +93,9 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
 
             return true;
         } else if (compare < 0) {
-            return node.right != null && removeFromSubtree(e, node.right, node);
+            return node.right != null && removeFromSubtree(e, node.right);
         } else {
-            return node.left != null && removeFromSubtree(e, node.left, node);
+            return node.left != null && removeFromSubtree(e, node.left);
         }
     }
 }
