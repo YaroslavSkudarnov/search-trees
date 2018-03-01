@@ -32,7 +32,6 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
             this.payload = replacement.payload;
             this.left = replacement.left;
             this.right = replacement.right;
-            this.parent = replacement.parent;
         }
     }
 
@@ -172,6 +171,12 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
     }
 
     protected abstract boolean removeFromSubtree(E e, N node);
+
+    protected void checkNullAndSetParent(N node, N parent) {
+        if (node != null) {
+            node.parent = parent;
+        }
+    }
 
     @Override
     public Iterator<E> iterator() {
