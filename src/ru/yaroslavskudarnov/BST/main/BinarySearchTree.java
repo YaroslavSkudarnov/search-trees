@@ -56,14 +56,10 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
     }
 
     N getNext(N node) {
-        if (node.right != null) {
-            node = node.right;
+        N firstNodeInRightSubtree = leftmostDescendant(node.right);
 
-            while (node.left != null) {
-                node = node.left;
-            }
-
-            return node;
+        if (firstNodeInRightSubtree != null) {
+            return firstNodeInRightSubtree;
         } else {
             while ((node.parent != null) && (node.parent.left != node)) {
                 node = node.parent;
@@ -74,18 +70,15 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
     }
 
     protected N leftmostDescendant(N node) {
-        @SuppressWarnings("unchecked")
-        N tmp = node;
-
         if (node == null) {
             return null;
         }
 
-        while (tmp.left != null) {
-            tmp = tmp.left;
+        while (node.left != null) {
+            node = node.left;
         }
 
-        return tmp;
+        return node;
     }
 
     protected N root;
