@@ -55,24 +55,22 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         return tmpResult;
     }
 
-    N getNext(N node) { //TODO: rewrite using node.parent
-        N tmp = root, tmpResult = null;
+    N getNext(N node) {
+        if (node.right != null) {
+            node = node.right;
 
-        while (tmp != null) {
-            if (tmp.payload.compareTo(node.payload) > 0) {
-                tmpResult = tmp;
-
-                tmp = tmp.left;
-            } else {
-                if (tmp.right != null) {
-                    tmp = tmp.right;
-                } else {
-                    return tmpResult;
-                }
+            while (node.left != null) {
+                node = node.left;
             }
-        }
 
-        return tmpResult;
+            return node;
+        } else {
+            while ((node.parent != null) && (node.parent.left != node)) {
+                node = node.parent;
+            }
+
+            return node.parent;
+        }
     }
 
     protected N leftmostDescendant(N node) {
