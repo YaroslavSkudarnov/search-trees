@@ -77,7 +77,7 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
     @Test
     public void smallRandomTest() {
         for (int i = 1; i <= 20; i++) {
-            randomTest(10, 15);
+            randomTest(10, i);
         }
     }
 
