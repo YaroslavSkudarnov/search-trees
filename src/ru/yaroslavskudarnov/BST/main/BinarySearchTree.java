@@ -167,6 +167,31 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         }
     }
 
+    protected void updateLinks(E e, N node, N parent, N replacement) {
+        checkNullAndSetParent(replacement, parent);
+
+        if (parent == null) {
+            if (replacement == null) {
+                node.payload = null;
+            } else {
+                node.replaceContent(replacement);
+                checkNullAndSetParent(node.left, node);
+                checkNullAndSetParent(node.right, node);
+            }
+        } else {
+            if ((parent.left != null) && (parent.left.compareTo(e) == 0)) {
+                parent.left = replacement;
+            } else {
+                parent.right = replacement;
+            }
+
+            if (replacement != null) {
+                checkNullAndSetParent(replacement.left, replacement);
+                checkNullAndSetParent(replacement.right, replacement);
+            }
+        }
+    }
+
     protected abstract boolean addToSubtree(E e, N node);
 
     protected abstract N initNode(E e);

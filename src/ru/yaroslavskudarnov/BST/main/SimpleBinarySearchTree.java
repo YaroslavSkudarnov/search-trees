@@ -77,29 +77,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                 }
             }
 
-            checkNullAndSetParent(replacement, parent);
-
-            if (parent == null) {
-                if (replacement == null) {
-                    node.payload = null;
-                } else {
-                    node.replaceContent(replacement);
-                }
-
-                checkNullAndSetParent(node.left, node);
-                checkNullAndSetParent(node.right, node);
-            } else {
-                if ((parent.left != null) && (parent.left.compareTo(e) == 0)) {
-                    parent.left = replacement;
-                } else {
-                    parent.right = replacement;
-                }
-
-                if (replacement != null) {
-                    checkNullAndSetParent(replacement.left, replacement);
-                    checkNullAndSetParent(replacement.right, replacement);
-                }
-            }
+            updateLinks(e, node, parent, replacement);
 
             return true;
         } else if (compare < 0) {

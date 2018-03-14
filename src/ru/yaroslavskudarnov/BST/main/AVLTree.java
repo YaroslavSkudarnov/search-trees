@@ -107,28 +107,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                 }
             }
 
-            checkNullAndSetParent(replacement, parent);
-
-            if (parent == null) {
-                if (replacement == null) {
-                    node.payload = null;
-                } else {
-                    node.replaceContent(replacement);
-                    checkNullAndSetParent(node.left, node);
-                    checkNullAndSetParent(node.right, node);
-                }
-            } else {
-                if ((parent.compareTo(e) > 0) && (parent.left != null) && (parent.left.compareTo(e) == 0)) {
-                    parent.left = replacement;
-                } else if ((parent.compareTo(e) < 0) && (parent.right != null) && (parent.right.compareTo(e) == 0)) {
-                    parent.right = replacement;
-                }
-
-                if (replacement != null) {
-                    checkNullAndSetParent(replacement.left, replacement);
-                    checkNullAndSetParent(replacement.right, replacement);
-                }
-            }
+            updateLinks(e, node, parent, replacement);
 
             result = true;
         } else if (compare < 0) {
