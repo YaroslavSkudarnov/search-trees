@@ -23,11 +23,6 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             super.replaceContent(replacement);
             this.balance = replacement.balance;
         }
-
-        AVLTreeNode(AVLTreeNode node, int balance) {
-            super(node);
-            this.balance = balance;
-        }
     }
 
     private Stack<Boolean> indicatorsOfNecessityOfRebalancing;
@@ -70,7 +65,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
     }
 
     @Override
-    protected AVLTreeNode initNode(E e) {
+    protected AVLTreeNode initFirstNode(E e) {
         return new AVLTreeNode(e, null);
     }
 
@@ -141,34 +136,12 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         return result;
     }
 
-    private void minorLeftRotationAux(AVLTreeNode node, AVLTreeNode parent) {
-        AVLTreeNode newSubRoot = node.right;
-
-        if (parent == null) {
-            root = newSubRoot;
-        } else {
-            if ((parent.left != null) && (parent.left.compareTo(node.payload) == 0)) {
-                parent.left = newSubRoot;
-            } else {
-                parent.right = newSubRoot;
-            }
-        }
-
-        newSubRoot.parent = parent;
-        node.right = newSubRoot.left;
-        if (node.right != null) {
-            node.right.parent = node;
-        }
-        node.parent = newSubRoot;
-        newSubRoot.left = node;
-    }
-
-    private void minorLeftRotation(AVLTreeNode node, AVLTreeNode parent) {
+    private void minorLeftRotationAVL(AVLTreeNode node, AVLTreeNode parent) {
         AVLTreeNode newSubRoot = node.right;
 
         boolean wasNewSubRootEvenlyBalanced = newSubRoot.balance == 0;
 
-        minorLeftRotationAux(node, parent);
+        minorLeftRotationCommon(node, parent);
 
         node.balance += 1;
         newSubRoot.balance += 1;
@@ -178,33 +151,11 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         }
     }
 
-    private void minorRightRotationAux(AVLTreeNode node, AVLTreeNode parent) {
-        AVLTreeNode newSubRoot = node.left;
-
-        if (parent == null) {
-            root = newSubRoot;
-        } else {
-            if ((parent.left != null) && (parent.left.compareTo(node.payload) == 0)) {
-                parent.left = newSubRoot;
-            } else {
-                parent.right = newSubRoot;
-            }
-        }
-
-        newSubRoot.parent = parent;
-        node.left = newSubRoot.right;
-        if (node.left != null) {
-            node.left.parent = node;
-        }
-        node.parent = newSubRoot;
-        newSubRoot.right = node;
-    }
-
-    private void minorRightRotation(AVLTreeNode node, AVLTreeNode parent) {
+    private void minorRightRotationAVL(AVLTreeNode node, AVLTreeNode parent) {
         AVLTreeNode newSubRoot = node.left;
         boolean wasNewSubRootEvenlyBalanced = newSubRoot.balance == 0;
 
-        minorRightRotationAux(node, parent);
+        minorRightRotationCommon(node, parent);
 
         node.balance -= 1;
         newSubRoot.balance -= 1;
@@ -218,8 +169,8 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         AVLTreeNode rightSubtreeRoot = exSubRoot.right, nextSubRoot = exSubRoot.right.left;
         int nextSubRootExBalance = nextSubRoot.balance;
 
-        minorRightRotationAux(rightSubtreeRoot, exSubRoot);
-        minorLeftRotationAux(exSubRoot, parent);
+        minorRightRotationCommon(rightSubtreeRoot, exSubRoot);
+        minorLeftRotationCommon(exSubRoot, parent);
 
         exSubRoot.balance = nextSubRootExBalance == -1 ? 1 : 0;
         rightSubtreeRoot.balance = nextSubRootExBalance == 1 ? -1 : 0;
@@ -230,8 +181,8 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         AVLTreeNode leftSubtreeRoot = exSubRoot.left, nextSubRoot = exSubRoot.left.right;
         int nextSubRootExBalance = nextSubRoot.balance;
 
-        minorLeftRotationAux(leftSubtreeRoot, exSubRoot);
-        minorRightRotationAux(exSubRoot, parent);
+        minorLeftRotationCommon(leftSubtreeRoot, exSubRoot);
+        minorRightRotationCommon(exSubRoot, parent);
 
         exSubRoot.balance = nextSubRootExBalance == 1 ? -1 : 0;
         leftSubtreeRoot.balance = nextSubRootExBalance == -1 ? 1 : 0;
@@ -314,7 +265,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             if (node.right.balance == 1) {
                 majorLeftRotation(node, parent);
             } else {
-                minorLeftRotation(node, parent);
+                minorLeftRotationAVL(node, parent);
             }
         }
     }
@@ -324,7 +275,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             if (node.left.balance == -1) {
                 majorRightRotation(node, parent);
             } else {
-                minorRightRotation(node, parent);
+                minorRightRotationAVL(node, parent);
             }
         }
     }

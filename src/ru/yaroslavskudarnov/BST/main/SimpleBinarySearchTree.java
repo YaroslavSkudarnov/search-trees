@@ -47,7 +47,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
     }
 
     @Override
-    protected SimpleBinarySearchTreeNode initNode(E e) {
+    protected SimpleBinarySearchTreeNode initFirstNode(E e) {
         return new SimpleBinarySearchTreeNode(e, null);
     }
 

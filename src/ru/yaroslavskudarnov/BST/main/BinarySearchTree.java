@@ -160,7 +160,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
     @Override
     public boolean add(E e) {
         if (isEmpty()) {
-            root = initNode(e);
+            root = initFirstNode(e);
             return true;
         } else {
             return addToSubtree(e, root);
@@ -192,9 +192,48 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         }
     }
 
+    private void pullNewRootUpAndUpdateLinksToParents(N node, N parent, N newSubRoot) {
+        if (parent == null) {
+            root = newSubRoot;
+        } else {
+            if ((parent.left != null) && (parent.left.compareTo(node.payload) == 0)) {
+                parent.left = newSubRoot;
+            } else {
+                parent.right = newSubRoot;
+            }
+        }
+
+        newSubRoot.parent = parent;
+        node.parent = newSubRoot;
+    }
+
+    protected void minorLeftRotationCommon(N node, N parent) {
+        N newSubRoot = node.right;
+
+        pullNewRootUpAndUpdateLinksToParents(node, parent, newSubRoot);
+
+        node.right = newSubRoot.left;
+        if (node.right != null) {
+            node.right.parent = node;
+        }
+        newSubRoot.left = node;
+    }
+
+    protected void minorRightRotationCommon(N node, N parent) {
+        N newSubRoot = node.left;
+
+        pullNewRootUpAndUpdateLinksToParents(node, parent, newSubRoot);
+
+        node.left = newSubRoot.right;
+        if (node.left != null) {
+            node.left.parent = node;
+        }
+        newSubRoot.right = node;
+    }
+
     protected abstract boolean addToSubtree(E e, N node);
 
-    protected abstract N initNode(E e);
+    protected abstract N initFirstNode(E e);
 
     @Override
     public boolean remove(Object o) {
