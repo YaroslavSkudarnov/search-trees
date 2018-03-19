@@ -1,7 +1,5 @@
 package ru.yaroslavskudarnov.BST.main;
 
-import java.util.Objects;
-
 /**
  * User: Skudarnov Yaroslav
  * Date: 2/24/2018
@@ -14,7 +12,6 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
 
     class RBTreeNode extends BinarySearchTree<E, RBTreeNode>.BinarySearchTreeNode {
         Color color;
-        RBTreeNode parent;
 
         RBTreeNode(E payload, RBTreeNode parent) {
             super(payload);
@@ -43,21 +40,32 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
         if (node.parent == null) {
             node.color = Color.BLACK;
         } else if (node.parent.color != Color.BLACK) {
-            if (getColor(node.uncle()) == Color.BLACK) {
+            RBTreeNode uncle = node.uncle();
+
+            if (getColor(uncle) == Color.BLACK) {
+                if ((node.parent.parent.left != null) && (node.parent.parent.left.right == node)) {
+                    minorLeftRotationCommon(node.parent, node.parent.parent); // place node in the left border of a subtree
+                    node = node.left;
+                } else if ((node.parent.parent.right != null)  && (node.parent.parent.right.left == node)) {
+                    minorRightRotationCommon(node.parent, node.parent.parent); // place node in the right border of a subtree
+                    node = node.right;
+                }
+
                 node.parent.color = Color.BLACK;
                 node.parent.parent.color = Color.RED;
 
                 if (node.parent.left == node) {
-                    minorRightRotationCommon(node, node.parent);
+                    minorRightRotationCommon(node.parent.parent, node.parent.parent.parent);
                 } else {
-                    minorLeftRotationCommon(node, node.parent);
+                    minorLeftRotationCommon(node.parent.parent, node.parent.parent.parent);
                 }
             } else {
-                RBTreeNode uncle = node.uncle();
                 assert uncle != null; // uncle can't be null if his color is red
                 uncle.color = Color.BLACK;
                 node.parent.color = Color.BLACK;
                 node.parent.parent.color = Color.RED;
+
+                rebalanceAfterInserting(node.parent.parent);
             }
         }
     }
@@ -70,13 +78,13 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
             return false;
         }
 
-        boolean result, insertedNow = false;
+        boolean result; RBTreeNode insertedNode = null;
 
         if (compare < 0) {
             if (node.right == null) {
                 node.right = new RBTreeNode(e, node);
                 result = true;
-                insertedNow = true;
+                insertedNode = node.right;
             } else {
                 result = addToSubtree(e, node.right);
             }
@@ -84,14 +92,14 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
             if (node.left == null) {
                 node.left = new RBTreeNode(e, node);
                 result = true;
-                insertedNow = true;
+                insertedNode = node.left;
             } else {
                 result = addToSubtree(e, node.left);
             }
         }
 
-        if (insertedNow) {
-            rebalanceAfterInserting(node);
+        if (insertedNode != null) {
+            rebalanceAfterInserting(insertedNode);
         }
 
         return result;
@@ -99,7 +107,8 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
 
     @Override
     protected RBTreeNode initFirstNode(E e) {
-        return new RBTreeNode(e, null);
+        RBTreeNode node = new RBTreeNode(e, null); node.color = Color.BLACK;
+        return node;
     }
 
     @Override
