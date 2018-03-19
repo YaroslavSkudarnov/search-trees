@@ -44,10 +44,10 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
 
             if (getColor(uncle) == Color.BLACK) {
                 if ((node.parent.parent.left != null) && (node.parent.parent.left.right == node)) {
-                    minorLeftRotationCommon(node.parent, node.parent.parent); // place node in the left border of a subtree
+                    minorLeftRotationCommon(node.parent); // place node in the left border of a subtree
                     node = node.left;
                 } else if ((node.parent.parent.right != null)  && (node.parent.parent.right.left == node)) {
-                    minorRightRotationCommon(node.parent, node.parent.parent); // place node in the right border of a subtree
+                    minorRightRotationCommon(node.parent); // place node in the right border of a subtree
                     node = node.right;
                 }
 
@@ -55,9 +55,9 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
                 node.parent.parent.color = Color.RED;
 
                 if (node.parent.left == node) {
-                    minorRightRotationCommon(node.parent.parent, node.parent.parent.parent);
+                    minorRightRotationCommon(node.parent.parent);
                 } else {
-                    minorLeftRotationCommon(node.parent.parent, node.parent.parent.parent);
+                    minorLeftRotationCommon(node.parent.parent);
                 }
             } else {
                 assert uncle != null; // uncle can't be null if his color is red

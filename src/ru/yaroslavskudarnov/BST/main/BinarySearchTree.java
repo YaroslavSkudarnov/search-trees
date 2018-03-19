@@ -192,7 +192,9 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         }
     }
 
-    private void pullNewRootUpAndUpdateLinksToParents(N node, N parent, N newSubRoot) {
+    private void pullNewRootUpAndUpdateLinksToParents(N node, N newSubRoot) {
+        N parent = node.parent;
+
         if (parent == null) {
             root = newSubRoot;
         } else {
@@ -207,10 +209,10 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         node.parent = newSubRoot;
     }
 
-    protected void minorLeftRotationCommon(N node, N parent) {
+    protected void minorLeftRotationCommon(N node) {
         N newSubRoot = node.right;
 
-        pullNewRootUpAndUpdateLinksToParents(node, parent, newSubRoot);
+        pullNewRootUpAndUpdateLinksToParents(node, newSubRoot);
 
         node.right = newSubRoot.left;
         if (node.right != null) {
@@ -219,10 +221,10 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         newSubRoot.left = node;
     }
 
-    protected void minorRightRotationCommon(N node, N parent) {
+    protected void minorRightRotationCommon(N node) {
         N newSubRoot = node.left;
 
-        pullNewRootUpAndUpdateLinksToParents(node, parent, newSubRoot);
+        pullNewRootUpAndUpdateLinksToParents(node, newSubRoot);
 
         node.left = newSubRoot.right;
         if (node.left != null) {

@@ -109,13 +109,13 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             result = node.right != null && removeFromSubtree(e, node.right);
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {
-                rebalanceAfterChangingSubtreeIfNecessary(node, parent, -1, -1);
+                rebalanceAfterChangingSubtreeIfNecessary(node, -1, -1);
             }
         } else {
             result = node.left != null && removeFromSubtree(e, node.left);
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {
-                rebalanceAfterChangingSubtreeIfNecessary(node, parent, -1, 1);
+                rebalanceAfterChangingSubtreeIfNecessary(node, -1, 1);
             }
         }
 
@@ -136,12 +136,12 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         return result;
     }
 
-    private void minorLeftRotationAVL(AVLTreeNode node, AVLTreeNode parent) {
+    private void minorLeftRotationAVL(AVLTreeNode node) {
         AVLTreeNode newSubRoot = node.right;
 
         boolean wasNewSubRootEvenlyBalanced = newSubRoot.balance == 0;
 
-        minorLeftRotationCommon(node, parent);
+        minorLeftRotationCommon(node);
 
         node.balance += 1;
         newSubRoot.balance += 1;
@@ -151,11 +151,11 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         }
     }
 
-    private void minorRightRotationAVL(AVLTreeNode node, AVLTreeNode parent) {
+    private void minorRightRotationAVL(AVLTreeNode node) {
         AVLTreeNode newSubRoot = node.left;
         boolean wasNewSubRootEvenlyBalanced = newSubRoot.balance == 0;
 
-        minorRightRotationCommon(node, parent);
+        minorRightRotationCommon(node);
 
         node.balance -= 1;
         newSubRoot.balance -= 1;
@@ -165,24 +165,24 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
         }
     }
 
-    private void majorLeftRotation(AVLTreeNode exSubRoot, AVLTreeNode parent) {
+    private void majorLeftRotation(AVLTreeNode exSubRoot) {
         AVLTreeNode rightSubtreeRoot = exSubRoot.right, nextSubRoot = exSubRoot.right.left;
         int nextSubRootExBalance = nextSubRoot.balance;
 
-        minorRightRotationCommon(rightSubtreeRoot, exSubRoot);
-        minorLeftRotationCommon(exSubRoot, parent);
+        minorRightRotationCommon(rightSubtreeRoot);
+        minorLeftRotationCommon(exSubRoot);
 
         exSubRoot.balance = nextSubRootExBalance == -1 ? 1 : 0;
         rightSubtreeRoot.balance = nextSubRootExBalance == 1 ? -1 : 0;
         nextSubRoot.balance = 0;
     }
     
-    private void majorRightRotation(AVLTreeNode exSubRoot, AVLTreeNode parent) {
+    private void majorRightRotation(AVLTreeNode exSubRoot) {
         AVLTreeNode leftSubtreeRoot = exSubRoot.left, nextSubRoot = exSubRoot.left.right;
         int nextSubRootExBalance = nextSubRoot.balance;
 
-        minorLeftRotationCommon(leftSubtreeRoot, exSubRoot);
-        minorRightRotationCommon(exSubRoot, parent);
+        minorLeftRotationCommon(leftSubtreeRoot);
+        minorRightRotationCommon(exSubRoot);
 
         exSubRoot.balance = nextSubRootExBalance == 1 ? -1 : 0;
         leftSubtreeRoot.balance = nextSubRootExBalance == -1 ? 1 : 0;
@@ -209,7 +209,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {
-                rebalanceAfterChangingSubtreeIfNecessary(node, parent, 1, -1);
+                rebalanceAfterChangingSubtreeIfNecessary(node, 1, -1);
             }
         } else {
             if (node.left == null) {
@@ -220,7 +220,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
             }
 
             if (indicatorsOfNecessityOfRebalancing.peek() && result) {
-                rebalanceAfterChangingSubtreeIfNecessary(node, parent, 1, 1);
+                rebalanceAfterChangingSubtreeIfNecessary(node, 1, 1);
             }
         }
 
@@ -244,38 +244,37 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
     /**
      * Updates balance of current node. To be invoked after changing one of its subtrees.
      * @param node current node
-     * @param parent its parent
      * @param changeInNumberOfNodes +1 if this is invoked after adding new node, -1 if after deleting existing
      * @param subtreeChanged +1 if left, -1 if right
      */
-    private void rebalanceAfterChangingSubtreeIfNecessary(AVLTreeNode node, AVLTreeNode parent, int changeInNumberOfNodes, int subtreeChanged) {
+    private void rebalanceAfterChangingSubtreeIfNecessary(AVLTreeNode node, int changeInNumberOfNodes, int subtreeChanged) {
         node.balance += changeInNumberOfNodes * subtreeChanged;
 
         if (node.balance != 0) {
             if ((changeInNumberOfNodes * subtreeChanged) > 0) {
-                rightRotationsIfNecessary(node, parent); //if we added a node in the left subtree or deleted it from the right subtree
+                rightRotationsIfNecessary(node); //if we added a node in the left subtree or deleted it from the right subtree
             } else {
-                leftRotationsIfNecessary(node, parent);  //if we added a node in the right subtree or deleted it from the left subtree
+                leftRotationsIfNecessary(node);  //if we added a node in the right subtree or deleted it from the left subtree
             }
         }
     }
 
-    private void leftRotationsIfNecessary(AVLTreeNode node, AVLTreeNode parent) {
+    private void leftRotationsIfNecessary(AVLTreeNode node) {
         if (node.balance == -2) {
             if (node.right.balance == 1) {
-                majorLeftRotation(node, parent);
+                majorLeftRotation(node);
             } else {
-                minorLeftRotationAVL(node, parent);
+                minorLeftRotationAVL(node);
             }
         }
     }
 
-    private void rightRotationsIfNecessary(AVLTreeNode node, AVLTreeNode parent) {
+    private void rightRotationsIfNecessary(AVLTreeNode node) {
         if (node.balance == 2) {
             if (node.left.balance == -1) {
-                majorRightRotation(node, parent);
+                majorRightRotation(node);
             } else {
-                minorRightRotationAVL(node, parent);
+                minorRightRotationAVL(node);
             }
         }
     }
