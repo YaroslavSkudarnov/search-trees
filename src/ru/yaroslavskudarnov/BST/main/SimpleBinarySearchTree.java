@@ -71,7 +71,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                         replacement = node.left;
                     } else {
                         replacement = next;
-                        SimpleBinarySearchTree.this.remove(replacement.payload);
+                        remove(replacement.payload);
                         replacement.left = node.left; replacement.right = node.right;
                     }
                 }

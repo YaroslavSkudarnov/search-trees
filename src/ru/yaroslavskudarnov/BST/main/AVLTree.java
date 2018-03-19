@@ -92,7 +92,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                         replacement = node.left;
                     } else {
                         replacement = next;
-                        AVLTree.this.remove(replacement.payload);
+                        remove(replacement.payload);
                         replacement.left = node.left; replacement.right = node.right;
                         replacement.balance = node.balance;
                         parent = findParent(e); replacement.parent = parent;
