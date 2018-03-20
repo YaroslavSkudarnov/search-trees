@@ -20,15 +20,19 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
         }
 
         private RBTreeNode uncle() {
-            RBTreeNode grandparent;
-
-            if ((parent == null) || (parent.parent == null)) {
+            if (parent == null) {
                 return null;
             }
 
-            grandparent = parent.parent;
+            return parent.sibling();
+        }
 
-            return grandparent.left == parent ? grandparent.right : grandparent.left;
+        private RBTreeNode sibling() {
+            if (parent == null) {
+                return null;
+            }
+
+            return parent.left == this ? parent.right : parent.left;
         }
     }
 
