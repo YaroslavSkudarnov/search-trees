@@ -86,19 +86,18 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                 if (node.right == null) {
                     replacement = node.left;
                 } else {
-                    AVLTreeNode next = getNext(node);
+                    replacement = getNext(node);
 
-                    if (next == null) {
-                        replacement = node.left;
-                    } else {
-                        replacement = next;
-                        remove(replacement.payload);
-                        replacement.left = node.left; replacement.right = node.right;
-                        replacement.balance = node.balance;
-                        parent = findParent(e); replacement.parent = parent;
-
-                        indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
+                    if (replacement == null) {
+                        replacement = getPrevious(node);
                     }
+
+                    remove(replacement.payload);
+                    replacement.left = node.left; replacement.right = node.right;
+                    replacement.balance = node.balance;
+                    parent = findParent(e); replacement.parent = parent;
+
+                    indicatorsOfNecessityOfRebalancing.set(indicatorsOfNecessityOfRebalancing.size() - 1, false);
                 }
             }
 

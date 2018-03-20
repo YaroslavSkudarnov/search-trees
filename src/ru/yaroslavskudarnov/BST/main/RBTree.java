@@ -132,17 +132,16 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
                 if (node.right == null) {
                     replacement = node.left;
                 } else {
-                    RBTreeNode next = getNext(node);
+                    replacement = getNext(node);
 
-                    if (next == null) {
-                        replacement = node.left;
-                    } else {
-                        replacement = next;
-                        remove(replacement.payload);
-                        replacement.left = node.left; replacement.right = node.right;
-                        replacement.color = node.color;
-                        parent = findParent(e); replacement.parent = parent;
+                    if (replacement == null) {
+                        replacement = getPrevious(node);
                     }
+
+                    remove(replacement.payload);
+                    replacement.left = node.left; replacement.right = node.right;
+                    replacement.color = node.color;
+                    parent = findParent(e); replacement.parent = parent;
                 }
             }
 

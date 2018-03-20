@@ -65,15 +65,14 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                 if (node.right == null) {
                     replacement = node.left;
                 } else {
-                    SimpleBinarySearchTreeNode next = getNext(node);
+                    replacement = getNext(node);
 
-                    if (next == null) {
-                        replacement = node.left;
-                    } else {
-                        replacement = next;
-                        remove(replacement.payload);
-                        replacement.left = node.left; replacement.right = node.right;
+                    if (replacement == null) {
+                        replacement = getPrevious(node);
                     }
+
+                    remove(replacement.payload);
+                    replacement.left = node.left; replacement.right = node.right;
                 }
             }
 
