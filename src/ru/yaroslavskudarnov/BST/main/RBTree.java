@@ -115,6 +115,14 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
         return node;
     }
 
+    private void rebalanceAfterRemoval(RBTreeNode node) {
+        if (node.color != Color.RED) { // if node.color is Color.RED, all the properties of red-black tree still hold true after removal
+            if (getColor(node.sibling()) == Color.RED) {
+
+            }
+        }
+    }
+
     @Override
     protected boolean removeFromSubtree(E e, RBTreeNode node) {
         int compare = node.compareTo(e);
@@ -126,27 +134,19 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
         if (compare == 0) {
             RBTreeNode replacement;
 
-            if (node.left == null) {
-                replacement = node.right;
+            if ((node.left != null) && (node.right != null)) {
+                replacement = getNext(node);
+
+                remove(replacement.payload);
+                replacement.left = node.left; replacement.right = node.right;
+                replacement.color = node.color;
+                parent = findParent(e); replacement.parent = parent;
             } else {
-                if (node.right == null) {
-                    replacement = node.left;
-                } else {
-                    replacement = getNext(node);
-
-                    if (replacement == null) {
-                        replacement = getPrevious(node);
-                    }
-
-                    remove(replacement.payload);
-                    replacement.left = node.left; replacement.right = node.right;
-                    replacement.color = node.color;
-                    parent = findParent(e); replacement.parent = parent;
-                }
+                replacement = node.left == null ? node.right : node.left;
             }
 
             updateLinks(e, node, parent, replacement);
-            rebalanceAfterInserting(insertedNode);
+            rebalanceAfterRemoval(node);
 
             result = true;
         } else if (compare < 0) {
