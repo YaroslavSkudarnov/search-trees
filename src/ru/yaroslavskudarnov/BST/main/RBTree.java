@@ -115,11 +115,32 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
         return node;
     }
 
-    private void rebalanceAfterRemoval(RBTreeNode node) {
-        if (node.color != Color.RED) { // if node.color is Color.RED, all the properties of red-black tree still hold true after removal
-            if (getColor(node.sibling()) == Color.RED) {
+    private void rebalanceAfterRemoval(RBTreeNode node, RBTreeNode sibling) {
+        if (node.color == Color.BLACK) { // if node.color is Color.RED, all the properties of red-black tree still hold true after removal
+            RBTreeNode child = node.left == null ? node.right : node.left;
 
+            if (getColor(child) == Color.RED) {
+                child.color = Color.BLACK;
+            } else {
+                repaintTree(child, sibling);
             }
+        }
+    }
+
+    private void repaintTree(RBTreeNode node, RBTreeNode sibling) {
+        if ((node != null) && (node.parent == null)) { //do we need it here? :thinking:
+            return;
+        }
+
+        if (getColor(sibling) == Color.RED) {
+            if (node == node.parent.left) {
+                minorLeftRotationCommon(node.parent);
+            } else {
+                minorRightRotationCommon(node.parent);
+            }
+
+            node.parent.color = Color.RED;
+            node.parent.parent.color = Color.BLACK;
         }
     }
 
@@ -132,7 +153,7 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
         RBTreeNode parent = node.parent;
 
         if (compare == 0) {
-            RBTreeNode replacement;
+            RBTreeNode replacement, sibling = node.sibling();
 
             if ((node.left != null) && (node.right != null)) {
                 replacement = getNext(node);
@@ -146,7 +167,10 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
             }
 
             updateLinks(e, node, parent, replacement);
-            rebalanceAfterRemoval(node);
+
+            if ((node.left == null) || (node.right == null)) {
+                rebalanceAfterRemoval(node, sibling);
+            }
 
             result = true;
         } else if (compare < 0) {
