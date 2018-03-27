@@ -115,32 +115,51 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
         return node;
     }
 
-    private void rebalanceAfterRemoval(RBTreeNode node, RBTreeNode sibling) {
+    private void rebalanceAfterRemoval(RBTreeNode node, RBTreeNode replacement) {
         if (node.color == Color.BLACK) { // if node.color is Color.RED, all the properties of red-black tree still hold true after removal
-            RBTreeNode child = node.left == null ? node.right : node.left;
-
-            if (getColor(child) == Color.RED) {
-                child.color = Color.BLACK;
+            if (getColor(replacement) == Color.RED) {
+                replacement.color = Color.BLACK;
+                updateLinks(node, node.parent, replacement);
             } else {
-                repaintTree(child, sibling);
+                RBTreeNode sibling = node.sibling(), parent = node.parent;
+                updateLinks(node, parent, replacement);
+                repaintTree(replacement, parent, sibling);
             }
+        } else {
+            if (node.parent.left == node) {
+                node.parent.left = replacement;
+            } else {
+                node.parent.right = replacement;
+            }
+
+            checkNullAndSetParent(replacement, node.parent);
         }
     }
 
-    private void repaintTree(RBTreeNode node, RBTreeNode sibling) {
-        if ((node != null) && (node.parent == null)) { //do we need it here? :thinking:
+    private void repaintTree(RBTreeNode node, RBTreeNode parent, RBTreeNode sibling) {
+        if (parent == null) { //do we need it here? :thinking:
+            if (node != null) {
+                assert node.color == Color.BLACK;
+            }
+
             return;
         }
 
         if (getColor(sibling) == Color.RED) {
-            if (node == node.parent.left) {
-                minorLeftRotationCommon(node.parent);
+            if (node == parent.left) {
+                minorLeftRotationCommon(parent);
             } else {
-                minorRightRotationCommon(node.parent);
+                minorRightRotationCommon(parent);
             }
 
-            node.parent.color = Color.RED;
-            node.parent.parent.color = Color.BLACK;
+            parent.color = Color.RED;
+            parent.parent.color = Color.BLACK;
+        }
+
+        if (node == null) {
+            sibling = parent.left == null ? parent.right : parent.left;
+        } else {
+            sibling = node.sibling();
         }
     }
 
@@ -162,14 +181,10 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
                 replacement.left = node.left; replacement.right = node.right;
                 replacement.color = node.color;
                 parent = findParent(e); replacement.parent = parent;
+                updateLinks(node, parent, replacement);
             } else {
                 replacement = node.left == null ? node.right : node.left;
-            }
-
-            updateLinks(e, node, parent, replacement);
-
-            if ((node.left == null) || (node.right == null)) {
-                rebalanceAfterRemoval(node, sibling);
+                rebalanceAfterRemoval(node, replacement);
             }
 
             result = true;
