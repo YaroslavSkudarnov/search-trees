@@ -76,7 +76,7 @@ public class SimpleBinarySearchTree<E extends Comparable<? super E>> extends Bin
                 }
             }
 
-            updateLinks(e, node, parent, replacement);
+            updateLinks(node, parent, replacement);
 
             return true;
         } else if (compare < 0) {

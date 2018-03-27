@@ -167,7 +167,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         }
     }
 
-    protected void updateLinks(E e, N node, N parent, N replacement) {
+    protected void updateLinks(N node, N parent, N replacement) {
         checkNullAndSetParent(replacement, parent);
 
         if (parent == null) {
@@ -179,7 +179,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
                 checkNullAndSetParent(node.right, node);
             }
         } else {
-            if ((parent.left != null) && (parent.left.compareTo(e) == 0)) {
+            if ((parent.left != null) && (parent.left.compareTo(node.payload) == 0)) {
                 parent.left = replacement;
             } else {
                 parent.right = replacement;

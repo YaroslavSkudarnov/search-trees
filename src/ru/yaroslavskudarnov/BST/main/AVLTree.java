@@ -101,7 +101,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
                 }
             }
 
-            updateLinks(e, node, parent, replacement);
+            updateLinks(node, parent, replacement);
 
             result = true;
         } else if (compare < 0) {
