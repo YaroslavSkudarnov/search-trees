@@ -137,15 +137,13 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
     }
 
     private void repaintTree(RBTreeNode node, RBTreeNode parent, RBTreeNode sibling) {
-        if (parent == null) { //do we need it here? :thinking:
-            if (node != null) {
-                assert node.color == Color.BLACK;
-            }
+        if (parent == null) { // node is root
+            assert node.color == Color.BLACK;
 
             return;
         }
 
-        if (getColor(sibling) == Color.RED) {
+        if (getColor(sibling) == Color.RED) { // node has red sibling
             if (node == parent.left) {
                 minorLeftRotationCommon(parent);
             } else {
@@ -160,6 +158,18 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
             sibling = parent.left == null ? parent.right : parent.left;
         } else {
             sibling = node.sibling();
+        }
+
+        // now we know: sibling is black
+
+        assert sibling != null;
+
+        if ((getColor(sibling.left) == Color.BLACK) && (getColor(sibling.right) == Color.BLACK)) {
+            if (getColor(parent) == Color.BLACK) {
+
+            } else {
+
+            }
         }
     }
 
