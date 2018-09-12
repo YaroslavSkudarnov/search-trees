@@ -121,9 +121,9 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
                 replacement.color = Color.BLACK;
                 updateLinks(node, node.parent, replacement);
             } else {
-                RBTreeNode sibling = node.sibling(), parent = node.parent;
+                RBTreeNode parent = node.parent;
                 updateLinks(node, parent, replacement);
-                repaintTree(replacement, parent, sibling);
+                repaintTree(replacement, parent);
             }
         } else {
             if (node.parent.left == node) {
@@ -136,14 +136,17 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
         }
     }
 
-    private void repaintTree(RBTreeNode node, RBTreeNode parent, RBTreeNode sibling) {
-        if (parent == null) { // node is root
-            assert node.color == Color.BLACK;
-
+    private void repaintTree(RBTreeNode node, RBTreeNode parent) {
+        if (parent == null) {
+            if (node != null) {
+                node.color = Color.BLACK;
+            }
             return;
         }
 
-        if (getColor(sibling) == Color.RED) { // node has red sibling
+        RBTreeNode sibling = getSiblingEvenForNullNode(node, parent);
+
+        if (getColor(sibling) == Color.RED) {
             if (node == parent.left) {
                 minorLeftRotationCommon(parent);
             } else {
@@ -152,25 +155,51 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
 
             parent.color = Color.RED;
             parent.parent.color = Color.BLACK;
+            sibling = getSiblingEvenForNullNode(node, parent);
         }
 
+        if ((getColor(sibling.left) == Color.BLACK) && (getColor(sibling.right) == Color.BLACK)) {
+            sibling.color = Color.RED;
+
+            if (getColor(parent) == Color.BLACK) {
+                repaintTree(parent, parent.parent);
+            } else {
+                parent.color = Color.BLACK;
+            }
+        } else {
+            if ((node == parent.left) && (getColor(sibling.right) == Color.BLACK) && (getColor(sibling.left) == Color.RED)) {
+                sibling.color = Color.RED;
+                sibling.left.color = Color.BLACK;
+                minorRightRotationCommon(sibling);
+            } else if ((node == parent.right) && (getColor(sibling.left) == Color.BLACK) && (getColor(sibling.right) == Color.RED)) {
+                sibling.color = Color.RED;
+                sibling.right.color = Color.BLACK;
+                minorLeftRotationCommon(sibling);
+            }
+
+            sibling = getSiblingEvenForNullNode(node, parent);
+
+            sibling.color = parent.color;
+            parent.color = Color.BLACK;
+
+            if (node == parent.left) {
+                sibling.right.color = Color.BLACK;
+                minorLeftRotationCommon(parent);
+            } else {
+                sibling.left.color = Color.BLACK;
+                minorRightRotationCommon(parent);
+            }
+        }
+    }
+
+    private RBTreeNode getSiblingEvenForNullNode(RBTreeNode node, RBTreeNode parent) {
+        RBTreeNode sibling;
         if (node == null) {
             sibling = parent.left == null ? parent.right : parent.left;
         } else {
             sibling = node.sibling();
         }
-
-        // now we know: sibling is black
-
-        assert sibling != null;
-
-        if ((getColor(sibling.left) == Color.BLACK) && (getColor(sibling.right) == Color.BLACK)) {
-            if (getColor(parent) == Color.BLACK) {
-
-            } else {
-
-            }
-        }
+        return sibling;
     }
 
     @Override
@@ -179,10 +208,8 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
 
         boolean result;
 
-        RBTreeNode parent = node.parent;
-
         if (compare == 0) {
-            RBTreeNode replacement, sibling = node.sibling();
+            RBTreeNode replacement;
 
             if ((node.left != null) && (node.right != null)) {
                 replacement = getNext(node);
@@ -190,7 +217,7 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
                 remove(replacement.payload);
                 replacement.left = node.left; replacement.right = node.right;
                 replacement.color = node.color;
-                parent = findParent(e); replacement.parent = parent;
+                RBTreeNode parent = findParent(e); replacement.parent = parent;
                 updateLinks(node, parent, replacement);
             } else {
                 replacement = node.left == null ? node.right : node.left;
