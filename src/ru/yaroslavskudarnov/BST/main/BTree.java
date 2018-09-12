@@ -27,7 +27,8 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
         private BTreeNode(E payload) {
             this.keys = new ArrayList<>();
-            keys.add(payload);
+            this.keys.add(payload);
+            this.children = new ArrayList<>();
         }
 
         private BTreeNode(BTreeNode node) {
@@ -69,7 +70,44 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
     @Override
     public boolean add(E e) {
-        return false;
+        if (isEmpty()) {
+            root = initFirstNode(e);
+            return true;
+        } else {
+            return addToSubtree(e, root);
+        }
+    }
+
+    private boolean addToSubtree(E e, BTreeNode node) {
+        int index = getAppropriateIndex(e, node);
+
+        //check ranges?
+
+        if (node.keys.get(index).compareTo(e) == 0) {
+            return false;
+        } else {
+            if (node.children.isEmpty()) {
+                //insert key to the current node
+                //rebalance this node and all its ancestors (if needed)
+                return true;
+            } else {
+                return addToSubtree(e, node.children.get(index));
+            }
+
+            /*if (index > node.children.size()) {//are there some other conditions which show that this vertex is out of range?
+                if (node.keys.size() + 1 > 2 * MINIMUM_NUMBER_OF_KEYS_IN_A_NODE - 1) {
+                    //split current vertex
+                } else {
+                    //add new key to the current vertex
+                }*/ //TODO: reuse later (in rebalancing-after-removal)
+            } else {
+                return addToSubtree(e, node.children.get(index));
+            }
+        }
+    }
+
+    private BTreeNode initFirstNode(E e) {
+        return new BTreeNode(e);
     }
 
     @Override
