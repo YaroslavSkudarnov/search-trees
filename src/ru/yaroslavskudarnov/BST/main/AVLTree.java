@@ -38,7 +38,7 @@ public class AVLTree<E extends Comparable<? super E>> extends BinarySearchTree<E
     @Override
     public boolean add(E e) {
         if (root == null) {
-            root = new AVLTreeNode(e, null);
+            root = initFirstNode(e);
             return true;
         } else {
             indicatorsOfNecessityOfRebalancing.push(true);
