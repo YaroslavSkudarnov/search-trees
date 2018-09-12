@@ -200,8 +200,6 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
     protected boolean removeFromSubtree(E e, RBTreeNode node) {
         int compare = node.compareTo(e);
 
-        boolean result;
-
         if (compare == 0) {
             RBTreeNode replacement;
 
@@ -218,13 +216,11 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
                 rebalanceAfterRemoval(node, replacement);
             }
 
-            result = true;
+            return true;
         } else if (compare < 0) {
-            result = node.right != null && removeFromSubtree(e, node.right);
+            return node.right != null && removeFromSubtree(e, node.right);
         } else {
-            result = node.left != null && removeFromSubtree(e, node.left);
+            return node.left != null && removeFromSubtree(e, node.left);
         }
-
-        return result;
     }
 }
