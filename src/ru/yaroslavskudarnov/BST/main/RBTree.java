@@ -193,13 +193,7 @@ public class RBTree<E extends Comparable<? super E>> extends BinarySearchTree<E,
     }
 
     private RBTreeNode getSiblingEvenForNullNode(RBTreeNode node, RBTreeNode parent) {
-        RBTreeNode sibling;
-        if (node == null) {
-            sibling = parent.left == null ? parent.right : parent.left;
-        } else {
-            sibling = node.sibling();
-        }
-        return sibling;
+        return node == null ? (parent.left == null ? parent.right : parent.left) : node.sibling();
     }
 
     @Override
