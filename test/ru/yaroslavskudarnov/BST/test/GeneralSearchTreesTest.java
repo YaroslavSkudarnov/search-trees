@@ -14,6 +14,10 @@ import java.util.Set;
  * Time: 1:24 PM
  */
 public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer, ?>> {
+    class TestResults {
+        long timeElapsed, insertionsTime, checksTime, removalsTime;
+    }
+
     @Test
     public void smallTestAddContainsAndRemove() {
         T tree = getTree();
@@ -40,10 +44,12 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
 
     protected abstract T getTree();
 
-    private long randomTest(int times, int elems) {
-        long timeElapsed = 0;
+    private TestResults randomTest(int times, int elems) {
+        TestResults results = new TestResults();
 
         for (int i = 0; i < times; ++i) {
+            long start, end;
+
             Set<Integer> firstSet = new HashSet<>(), secondSet = new HashSet<>();
             for (int j = 0; j < elems; ++j) {
                 firstSet.add((int) (Math.random() * 2 * elems)); secondSet.add((int) (Math.random() * 2 * elems));
@@ -52,26 +58,44 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
 
             T tree = getTree();
 
-            long start = System.currentTimeMillis();
-            tree.addAll(firstSet); tree.retainAll(secondSet);
-            long end = System.currentTimeMillis();
-            timeElapsed += end - start;
+            start = System.currentTimeMillis();
+            tree.addAll(firstSet);
+            end = System.currentTimeMillis();
+            results.timeElapsed += end - start; results.insertionsTime += end - start;
 
-            firstSet.retainAll(secondSet);
-            Assert.assertTrue(firstSet.containsAll(tree)); Assert.assertTrue(tree.containsAll(firstSet));
+            start = System.currentTimeMillis();
+            tree.retainAll(secondSet);
+            end = System.currentTimeMillis();
+            results.timeElapsed += end - start; results.removalsTime += end - start;
+
+            firstSet.retainAll(secondSet); Assert.assertTrue(firstSet.containsAll(tree));
+
+            start = System.currentTimeMillis();
+            Assert.assertTrue(tree.containsAll(firstSet));
+            end = System.currentTimeMillis();
+            results.timeElapsed += end - start; results.checksTime += end - start;
 
             tree = getTree();
 
             start = System.currentTimeMillis();
-            tree.addAll(thirdSet); tree.removeAll(secondSet);
+            tree.addAll(thirdSet);
             end = System.currentTimeMillis();
-            timeElapsed += end - start;
+            results.timeElapsed += end - start; results.insertionsTime += end - start;
 
-            thirdSet.removeAll(secondSet);
-            Assert.assertTrue(thirdSet.containsAll(tree)); Assert.assertTrue(tree.containsAll(thirdSet));
+            start = System.currentTimeMillis();
+            tree.removeAll(secondSet);
+            end = System.currentTimeMillis();
+            results.timeElapsed += end - start; results.removalsTime += end - start;
+
+            thirdSet.removeAll(secondSet); Assert.assertTrue(thirdSet.containsAll(tree));
+
+            start = System.currentTimeMillis();
+            Assert.assertTrue(tree.containsAll(thirdSet));
+            end = System.currentTimeMillis();
+            results.timeElapsed += end - start; results.checksTime += end - start;
         }
 
-        return timeElapsed;
+        return results;
     }
 
     @Test
@@ -83,15 +107,14 @@ public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer,
 
     @Test
     public void bigRandomTests() {
-        long timeElapsed;
-
         for (int i = 1; i <= 10; ++i) {
             randomTest(15, i * 10000); //to warmup the JVM
         }
 
         for (int i = 1; i <= 20; ++i) {
-            timeElapsed = randomTest(5, i * 10000);
-            System.out.println("all the insertions and deletions in big tests with " + i * 10000 + " elements took " + timeElapsed + " milliseconds!");
+            TestResults results = randomTest(5, i * 10000);
+            System.out.println("all the insertions and removals in big tests with " + i * 10000 + " elements took " + results.timeElapsed + " milliseconds!");
+            System.out.println("insertions: " + results.insertionsTime + " ms, removals: " + results.removalsTime + " ms, checks: " + results.checksTime + "ms");
         }
     }
 }
