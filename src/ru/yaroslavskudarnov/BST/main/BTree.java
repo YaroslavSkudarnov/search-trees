@@ -89,18 +89,26 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
             return false;
         }
 
+        int index = getAppropriateIndex(e, node);
+
+        if (node.keys.get(index).compareTo(e) == 0) {
+            return true;
+        } else {
+            return subtreeContains(e, node.children.get(index));
+        }
+    }
+
+    private int getAppropriateIndex(E e, BTreeNode node) {
         if (node.keys.size() < NUMBER_OF_KEYS_TO_START_BINSEARCH) {
             for (int i = 0; i < node.keys.size(); ++i) {
                 int compare = node.keys.get(i).compareTo(e);
 
-                if (compare == 0) {
-                    return true;
-                } else if (compare > 0) {
-                    return subtreeContains(e, node.children.get(i));
+                if (compare >= 0) {
+                    return i;
                 }
             }
 
-            return subtreeContains(e, node.children.get(node.keys.size()));
+            return node.keys.size();
         } else {
             int l = 0, r = node.keys.size(); //TODO: test this
 
@@ -110,15 +118,15 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                 int compare = node.keys.get(m).compareTo(e);
 
                 if (compare == 0) {
-                    return true;
+                    return m;
                 } else if (compare > 0) {
-                    r = m;
+                    r = m + 1;
                 } else {
-                    l = m;
+                    l = m + 1;
                 }
             }
 
-            return subtreeContains(e, node.children.get(l));
+            return l;
         }
     }
 }
