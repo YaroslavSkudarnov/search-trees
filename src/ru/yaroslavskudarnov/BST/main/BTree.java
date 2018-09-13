@@ -25,14 +25,20 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
         private List<BTreeNode> children;
         private List<E> keys;
 
-        private BTreeNode(E payload) {
+        private BTreeNode() {
             this.keys = new ArrayList<>();
-            this.keys.add(payload);
             this.children = new ArrayList<>();
         }
 
-        private BTreeNode(BTreeNode node) {
-            replaceContent(node);
+        private BTreeNode(E payload) {
+            this();
+            this.keys.add(payload);
+        }
+
+        private BTreeNode(BTreeNode parent, List<BTreeNode> firstChildren, List<E> firstKeys) {
+            this.parent = parent;
+            this.children = firstChildren;
+            this.keys = firstKeys;
         }
 
         private void replaceContent(BTreeNode replacement) {
@@ -83,25 +89,59 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
         //check ranges?
 
-        if (node.keys.get(index).compareTo(e) == 0) {
+        if ((index < node.keys.size()) && (node.keys.get(index).compareTo(e) == 0)) {
             return false;
         } else {
             if (node.children.isEmpty()) {
-                //insert key to the current node
-                //rebalance this node and all its ancestors (if needed)
+                node.keys.add(index, e);
+                rebalanceAfterInsertion(node);
                 return true;
             } else {
                 return addToSubtree(e, node.children.get(index));
             }
+        }
+    }
 
-            /*if (index > node.children.size()) {//are there some other conditions which show that this vertex is out of range?
-                if (node.keys.size() + 1 > 2 * MINIMUM_NUMBER_OF_KEYS_IN_A_NODE - 1) {
-                    //split current vertex
-                } else {
-                    //add new key to the current vertex
-                }*/ //TODO: reuse later (in rebalancing-after-removal)
+    private void rebalanceAfterInsertion(BTreeNode node) {
+        if (node.keys.size() > 2 * MINIMUM_NUMBER_OF_KEYS_IN_A_NODE) {
+            int median = node.keys.size() / 2;
+            E middleKey = node.keys.get(median);
+
+            //create two new nodes with the same parent, splitted keys/children
+
+            List<E> firstKeys = new ArrayList<>(), secondKeys = new ArrayList<>();
+            for (int i = 0; i < median; ++i) {
+                firstKeys.add(node.keys.get(i));
+            }
+
+            for (int i = median + 1; i < node.keys.size(); ++i) {
+                secondKeys.add(node.keys.get(i));
+            }
+
+            List<BTreeNode> firstChildren = new ArrayList<>(), secondChildren = new ArrayList<>();
+            if (!node.children.isEmpty()) { //TODO: recheck this maybe?
+                for (int i = 0; i < median; ++i) {
+                    firstChildren.add(node.children.get(i));
+                }
+
+                for (int i = median + 1; i < node.children.size(); ++i) {
+                    secondChildren.add(node.children.get(i));
+                }
+            }
+
+            if (node.parent != null) {
+                BTreeNode firstHalf = new BTreeNode(node.parent, firstChildren, firstKeys), secondHalf = new BTreeNode(node.parent, secondChildren, secondKeys);
+                int indexOfCurrentNodeInParent = getAppropriateIndex(middleKey, node.parent);
+                node.parent.children.remove(indexOfCurrentNodeInParent);
+                node.parent.children.add(indexOfCurrentNodeInParent, secondHalf);
+                node.parent.children.add(indexOfCurrentNodeInParent, firstHalf);
+                node.parent.keys.add(indexOfCurrentNodeInParent, middleKey);
+                rebalanceAfterInsertion(node.parent);
             } else {
-                return addToSubtree(e, node.children.get(index));
+                root = new BTreeNode(middleKey);
+                BTreeNode firstHalf = new BTreeNode(root, firstChildren, firstKeys), secondHalf = new BTreeNode(root, secondChildren, secondKeys);
+                root.children.add(firstHalf);
+                root.children.add(secondHalf);
             }
         }
     }
