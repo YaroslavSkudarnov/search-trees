@@ -2,7 +2,7 @@ package ru.yaroslavskudarnov.BST.test;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.yaroslavskudarnov.BST.main.BinarySearchTree;
+import ru.yaroslavskudarnov.BST.core.SearchTree;
 
 import java.util.HashSet;
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.Set;
  * Date: 10/8/2017
  * Time: 1:24 PM
  */
-public abstract class GeneralSearchTreesTest<T extends BinarySearchTree<Integer, ?>> {
+public abstract class GeneralSearchTreesTest<T extends SearchTree<Integer>> {
     class TestResults {
         long timeElapsed, insertionsTime, checksTime, removalsTime;
     }
