@@ -42,6 +42,7 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
         }
 
         private void replaceContent(BTreeNode replacement) {
+            this.parent = replacement.parent;
             this.children = new ArrayList<>(replacement.children);
             this.keys = new ArrayList<>(replacement.keys);
         }
@@ -107,8 +108,6 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
             int median = node.keys.size() / 2;
             E middleKey = node.keys.get(median);
 
-            //create two new nodes with the same parent, splitted keys/children
-
             List<E> firstKeys = new ArrayList<>(), secondKeys = new ArrayList<>();
             for (int i = 0; i < median; ++i) {
                 firstKeys.add(node.keys.get(i));
@@ -120,28 +119,39 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
             List<BTreeNode> firstChildren = new ArrayList<>(), secondChildren = new ArrayList<>();
             if (!node.children.isEmpty()) { //TODO: recheck this maybe?
-                for (int i = 0; i < median; ++i) {
+                for (int i = 0; i < node.children.size() / 2; ++i) {
                     firstChildren.add(node.children.get(i));
                 }
 
-                for (int i = median + 1; i < node.children.size(); ++i) {
+                for (int i = node.children.size() / 2; i < node.children.size(); ++i) {
                     secondChildren.add(node.children.get(i));
                 }
             }
 
+            BTreeNode newChildrenParent = node.parent == null ? root : node.parent;
+            BTreeNode firstHalf = new BTreeNode(newChildrenParent, firstChildren, firstKeys), secondHalf = new BTreeNode(newChildrenParent, secondChildren, secondKeys);
+            for (BTreeNode childNode : firstHalf.children) {
+                childNode.parent = firstHalf;
+            }
+            for (BTreeNode childNode : secondHalf.children) {
+                childNode.parent = secondHalf;
+            }
+
+
             if (node.parent != null) {
-                BTreeNode firstHalf = new BTreeNode(node.parent, firstChildren, firstKeys), secondHalf = new BTreeNode(node.parent, secondChildren, secondKeys);
                 int indexOfCurrentNodeInParent = getAppropriateIndex(middleKey, node.parent);
+
                 node.parent.children.remove(indexOfCurrentNodeInParent);
                 node.parent.children.add(indexOfCurrentNodeInParent, secondHalf);
                 node.parent.children.add(indexOfCurrentNodeInParent, firstHalf);
                 node.parent.keys.add(indexOfCurrentNodeInParent, middleKey);
+
                 rebalanceAfterInsertion(node.parent);
             } else {
-                root = new BTreeNode(middleKey);
-                BTreeNode firstHalf = new BTreeNode(root, firstChildren, firstKeys), secondHalf = new BTreeNode(root, secondChildren, secondKeys);
-                root.children.add(firstHalf);
-                root.children.add(secondHalf);
+                BTreeNode newRoot = new BTreeNode(middleKey);
+                newRoot.children.add(firstHalf);
+                newRoot.children.add(secondHalf);
+                root.replaceContent(newRoot);
             }
         }
     }
