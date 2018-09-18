@@ -198,7 +198,7 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
             return node.keys.size();
         } else {
-            int l = 0, r = node.keys.size(); //TODO: test this
+            int l = 0, r = node.keys.size() - 1;
 
             while (l < r) {
                 int m = (l + r) / 2;
@@ -208,13 +208,17 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                 if (compare == 0) {
                     return m;
                 } else if (compare > 0) {
-                    r = m + 1;
+                    r = m - 1;
                 } else {
                     l = m + 1;
                 }
             }
 
-            return l;
+            if (node.keys.get(l).compareTo(e) < 0) {
+                return l + 1;
+            } else {
+                return l;
+            }
         }
     }
 }
