@@ -172,7 +172,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
 
         if (parent == null) {
             if (replacement == null) {
-                node.payload = null;
+                root = null;
             } else {
                 node.replaceContent(replacement);
                 checkNullAndSetParent(node.left, node);
@@ -294,9 +294,6 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
                 } else {
                     nextNode = getNext(currentNode);
                     BinarySearchTree.this.remove(currentNode.payload);
-                    if (root.payload == null) {
-                        root = null;
-                    }
                     currentNode = null;
                 }
             }
