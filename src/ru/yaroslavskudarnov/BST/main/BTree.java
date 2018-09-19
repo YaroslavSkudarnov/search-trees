@@ -72,7 +72,114 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        if (o == null) {
+            return false;
+        } else {
+            @SuppressWarnings("unchecked")
+            E e = (E) o;
+
+            return root != null && removeFromSubtree(e, root);
+        }
+    }
+
+    private boolean removeFromSubtree(E e, BTreeNode node) {
+        int index = getAppropriateIndex(e, node);
+
+        if ((index < node.keys.size()) && (node.keys.get(index).compareTo(e) == 0)) {
+            if (node.children.isEmpty()) {
+                node.keys.remove(index);
+                rebalanceAfterRemoval(node, e);
+            } else {
+                BTreeNode leafWithReplacement = leftmostDescendant(node.children.get(index + 1));
+                E replacement = leafWithReplacement.keys.get(0);
+                node.keys.set(index, replacement);
+                leafWithReplacement.keys.remove(0);
+                rebalanceAfterRemoval(leafWithReplacement, replacement); //TODO: replacement now is in the parent of that leaf. how do we handle this? test it.
+            }
+
+            return true;
+        } else {
+            return !node.children.isEmpty() && removeFromSubtree(e, node.children.get(index));
+        }
+    }
+
+    private void rebalanceAfterRemoval(BTreeNode node, E removedElement) {
+        BTreeNode parent = node.parent;
+
+        if (parent == null) {
+            if (node.keys.isEmpty()) {
+                if (node.children.isEmpty()) {
+                    root = null;
+                } else {
+                    assert root.children.size() < 2;
+                    root = root.children.get(0);
+                    root.parent = null;
+                }
+            }
+
+            return;
+        }
+
+        if (node.keys.size() < MINIMUM_NUMBER_OF_KEYS_IN_A_NODE) {
+            int indexInParent = getAppropriateIndex(removedElement, parent);
+            E exSeparator = parent.keys.get(indexInParent);
+
+            if ((indexInParent + 1 < parent.children.size()) && (parent.children.get(indexInParent + 1).keys.size() > MINIMUM_NUMBER_OF_KEYS_IN_A_NODE)) {
+                BTreeNode rightSibling = parent.children.get(indexInParent + 1);
+
+                node.keys.add(exSeparator);
+                parent.keys.set(indexInParent, rightSibling.keys.get(0));
+                rightSibling.keys.remove(0);
+
+                node.children.add(rightSibling.children.get(0));
+                rightSibling.children.remove(0);
+
+                return;
+            }
+
+            if ((indexInParent > 0) && (parent.children.get(indexInParent - 1).keys.size() > MINIMUM_NUMBER_OF_KEYS_IN_A_NODE)) {
+                BTreeNode leftSibling = parent.children.get(indexInParent - 1);
+
+                node.keys.add(exSeparator);
+                parent.keys.set(indexInParent, leftSibling.keys.get(leftSibling.keys.size() - 1));
+                leftSibling.keys.remove(leftSibling.keys.size() - 1);
+
+                node.children.add(leftSibling.children.get(leftSibling.children.size() - 1));
+                leftSibling.children.remove(leftSibling.children.size() - 1);
+
+                return;
+            }
+
+            BTreeNode leftNode, rightNode;
+
+            if (indexInParent + 1 < parent.children.size()) { //we have right sibling
+                leftNode = node; rightNode = parent.children.get(indexInParent + 1);
+            } else if (indexInParent > 0) { //we have left sibling
+                leftNode = parent.children.get(indexInParent - 1); rightNode = node;
+            } else {
+                leftNode = node; rightNode = node;
+                assert false;
+            }
+
+            leftNode.keys.add(exSeparator);
+            leftNode.keys.addAll(rightNode.keys);
+            leftNode.children.addAll(rightNode.children);
+            parent.children.remove(indexInParent + 1);
+            parent.keys.remove(indexInParent);
+            rebalanceAfterRemoval(node, exSeparator);
+        }
+    }
+
+    private BTreeNode leftmostDescendant(BTreeNode node) {
+        if (node == null) {
+            return null;
+        }
+
+        while (!node.children.isEmpty()) {
+            node = node.children.get(0);
+        }
+
+        return node;
     }
 
     @Override
