@@ -286,10 +286,10 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
         int index = getAppropriateIndex(e, node);
 
-        if (node.keys.get(index).compareTo(e) == 0) {
+        if ((index < node.keys.size()) && (node.keys.get(index).compareTo(e) == 0)) {
             return true;
         } else {
-            return subtreeContains(e, node.children.get(index));
+            return !node.children.isEmpty() && subtreeContains(e, node.children.get(index));
         }
     }
 
