@@ -5,6 +5,8 @@ import ru.yaroslavskudarnov.BST.core.SearchTree;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 /**
  * User: Skudarnov Yaroslav
@@ -46,11 +48,6 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
             this.children = new ArrayList<>(replacement.children);
             this.keys = new ArrayList<>(replacement.keys);
         }
-    }
-
-    @Override
-    public Iterator<E> iterator() {
-        return null;
     }
 
     @Override
@@ -122,7 +119,11 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
         if (node.keys.size() < MINIMUM_NUMBER_OF_KEYS_IN_A_NODE) {
             int indexInParent = getAppropriateIndex(removedElement, parent);
-            E exSeparator = parent.keys.get(indexInParent);
+            E exSeparator = indexInParent >= parent.keys.size() ? parent.keys.get(indexInParent - 1) : parent.keys.get(indexInParent);
+
+            if (removedElement.equals(exSeparator)) {
+                ++indexInParent;
+            }
 
             if ((indexInParent + 1 < parent.children.size()) && (parent.children.get(indexInParent + 1).keys.size() > MINIMUM_NUMBER_OF_KEYS_IN_A_NODE)) {
                 BTreeNode rightSibling = parent.children.get(indexInParent + 1);
@@ -152,9 +153,9 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
             BTreeNode leftNode, rightNode;
 
-            if (indexInParent + 1 < parent.children.size()) { //we have right sibling
+            if ((indexInParent + 1 < parent.children.size()) && (parent.children.get(indexInParent + 1) != node)) { //we have right sibling
                 leftNode = node; rightNode = parent.children.get(indexInParent + 1);
-            } else if (indexInParent > 0) { //we have left sibling
+            } else if ((indexInParent > 0) && (parent.children.get(0) != node)) { //we have left sibling
                 leftNode = parent.children.get(indexInParent - 1); rightNode = node;
             } else {
                 leftNode = node; rightNode = node;
@@ -163,10 +164,13 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
 
             leftNode.keys.add(exSeparator);
             leftNode.keys.addAll(rightNode.keys);
-            leftNode.children.addAll(rightNode.children);
+            leftNode.children.addAll(rightNode.children.stream().peek(x -> x.parent = leftNode).collect(Collectors.toList()));
+            if ((exSeparator.equals(removedElement) || (indexInParent == parent.keys.size()))) {
+                --indexInParent;
+            }
             parent.children.remove(indexInParent + 1);
             parent.keys.remove(indexInParent);
-            rebalanceAfterRemoval(node, exSeparator);
+            rebalanceAfterRemoval(node.parent, exSeparator);
         }
     }
 
@@ -327,5 +331,116 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                 return l;
             }
         }
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return new Iterator<>() {
+            private BTreeNode currentNode, nextNode = leftmostDescendant(root);
+            private int currentIndex = 0, nextIndex = 0;
+
+            @Override
+            public boolean hasNext() {
+                if (nextNode == null) {
+                    if (currentNode == null) {
+                        return false;
+                    } else {
+                        getNextNode();
+                    }
+                }
+
+                return nextNode != null;
+            }
+
+            @Override
+            public E next() {
+                if (!hasNext()) {
+                    throw new NoSuchElementException();
+                } else {
+                    currentNode = nextNode; nextNode = null;
+                    currentIndex = nextIndex; nextIndex = 0;
+                }
+
+                return currentNode.keys.get(currentIndex);
+            }
+
+            @Override
+            public void remove() {
+                if (currentNode == null) {
+                    throw new NoSuchElementException();
+                } else {
+                    getNextNode();
+                    if (nextNode != null) {
+                        E nextElement = nextNode.keys.get(nextIndex);
+                        BTree.this.remove(currentNode.keys.get(currentIndex));
+                        updateNextNodeAndIndex(nextElement);
+                    } else {
+                        BTree.this.remove(currentNode.keys.get(currentIndex));
+                    }
+                    currentNode = null;
+                }
+            }
+
+            private void getNextNode() {
+                if (currentNode.children.size() == 0) {
+                    if (currentIndex + 1 >= currentNode.keys.size()) {
+                        updateNextElemWithAncestor();
+                    } else {
+                        nextNode = currentNode;
+                        nextIndex = currentIndex + 1;
+                    }
+                } else {
+                    if (currentIndex + 1 > currentNode.keys.size()) {
+                        updateNextElemWithAncestor();
+                    } else {
+                        nextNode = leftmostDescendant(currentNode.children.get(currentIndex + 1));
+                        nextIndex = 0;
+                    }
+                }
+            }
+
+            private void updateNextElemWithAncestor() {
+                nextNode = currentNode; BTreeNode previousNode = currentNode;
+
+                do {
+                    nextNode = nextNode.parent;
+
+                    if (nextNode != null) {
+                        nextIndex = getAppropriateIndex(previousNode.keys.get(previousNode.keys.size() - 1), nextNode);
+                    } else {
+                        nextIndex = 0;
+                        return;
+                    }
+
+                    previousNode = nextNode;
+                } while (nextNode.keys.size() <= nextIndex);
+            }
+
+            private void updateNextNodeAndIndex(E nextElement) {
+                BTreeNode node = root;
+
+                if (node == null) {
+                    nextNode = null;
+                    return;
+                }
+
+                while (node != null) {
+                    int index = getAppropriateIndex(nextElement, node);
+
+                    if ((index < node.keys.size()) && (node.keys.get(index).compareTo(nextElement) == 0)) {
+                        nextNode = node;
+                        nextIndex = index;
+                        return;
+                    } else {
+                        if (node.children.isEmpty()) {
+                            nextNode = null;
+                            return;
+                        } else {
+                            node = node.children.get(index);
+                        }
+                    }
+                }
+            }
+        };
     }
 }
