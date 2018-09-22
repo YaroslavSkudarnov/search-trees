@@ -129,11 +129,16 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                 BTreeNode rightSibling = parent.children.get(indexInParent + 1);
 
                 node.keys.add(exSeparator);
+                if (indexInParent == parent.keys.size()) {
+                    --indexInParent;
+                }
                 parent.keys.set(indexInParent, rightSibling.keys.get(0));
                 rightSibling.keys.remove(0);
 
-                node.children.add(rightSibling.children.get(0));
-                rightSibling.children.remove(0);
+                if (!rightSibling.children.isEmpty()) {
+                    node.children.add(rightSibling.children.get(0));
+                    rightSibling.children.remove(0);
+                }
 
                 return;
             }
@@ -142,11 +147,16 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                 BTreeNode leftSibling = parent.children.get(indexInParent - 1);
 
                 node.keys.add(exSeparator);
+                if (indexInParent == parent.keys.size()) {
+                    --indexInParent;
+                }
                 parent.keys.set(indexInParent, leftSibling.keys.get(leftSibling.keys.size() - 1));
                 leftSibling.keys.remove(leftSibling.keys.size() - 1);
 
-                node.children.add(leftSibling.children.get(leftSibling.children.size() - 1));
-                leftSibling.children.remove(leftSibling.children.size() - 1);
+                if (!leftSibling.children.isEmpty()) {
+                    node.children.add(leftSibling.children.get(leftSibling.children.size() - 1));
+                    leftSibling.children.remove(leftSibling.children.size() - 1);
+                }
 
                 return;
             }
