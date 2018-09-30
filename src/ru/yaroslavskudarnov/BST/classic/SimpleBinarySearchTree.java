@@ -1,4 +1,6 @@
-package ru.yaroslavskudarnov.BST.main;
+package ru.yaroslavskudarnov.BST.classic;
+
+import ru.yaroslavskudarnov.BST.core.BinarySearchTree;
 
 import java.util.Collection;
 

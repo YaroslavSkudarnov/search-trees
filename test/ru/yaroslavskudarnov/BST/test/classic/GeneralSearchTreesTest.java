@@ -1,4 +1,4 @@
-package ru.yaroslavskudarnov.BST.test;
+package ru.yaroslavskudarnov.BST.test.classic;
 
 import org.junit.Assert;
 import org.junit.Test;

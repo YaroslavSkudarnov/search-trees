@@ -1,6 +1,4 @@
-package ru.yaroslavskudarnov.BST.main;
-
-import ru.yaroslavskudarnov.BST.core.SearchTree;
+package ru.yaroslavskudarnov.BST.core;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -12,9 +10,9 @@ import java.util.NoSuchElementException;
  * Time: 11:41 PM
  */
 public abstract class BinarySearchTree<E extends Comparable<? super E>, N extends BinarySearchTree<E, N>.BinarySearchTreeNode> extends SearchTree<E> {
-    public class BinarySearchTreeNode {
-        protected N left, right, parent;
-        protected E payload;
+    protected class BinarySearchTreeNode {
+        public N left, right, parent;
+        public E payload;
 
         protected BinarySearchTreeNode(E payload) {
             this.payload = payload;
@@ -24,7 +22,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
             replaceContent(node);
         }
 
-        protected int compareTo(E e) {
+        public int compareTo(E e) {
             return payload.compareTo(e);
         }
 
@@ -35,7 +33,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         }
     }
 
-    N getPrevious(N node) {
+    protected N getPrevious(N node) {
         N tmp = root, tmpResult = null;
 
         while (tmp != null) {
@@ -55,7 +53,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         return tmpResult;
     }
 
-    N getNext(N node) {
+    protected N getNext(N node) {
         N firstNodeInRightSubtree = leftmostDescendant(node.right);
 
         if (firstNodeInRightSubtree != null) {

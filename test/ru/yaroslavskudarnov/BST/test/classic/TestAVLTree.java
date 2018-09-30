@@ -1,6 +1,6 @@
-package ru.yaroslavskudarnov.BST.test;
+package ru.yaroslavskudarnov.BST.test.classic;
 
-import ru.yaroslavskudarnov.BST.main.AVLTree;
+import ru.yaroslavskudarnov.BST.classic.AVLTree;
 
 /**
  * User: Skudarnov Yaroslav

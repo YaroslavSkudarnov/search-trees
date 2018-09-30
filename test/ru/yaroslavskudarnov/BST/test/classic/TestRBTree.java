@@ -1,6 +1,6 @@
-package ru.yaroslavskudarnov.BST.test;
+package ru.yaroslavskudarnov.BST.test.classic;
 
-import ru.yaroslavskudarnov.BST.main.RBTree;
+import ru.yaroslavskudarnov.BST.classic.RBTree;
 
 public class TestRBTree extends GeneralSearchTreesTest<RBTree<Integer>> {
     @Override
