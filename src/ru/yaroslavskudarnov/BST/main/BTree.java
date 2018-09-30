@@ -140,11 +140,7 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                     node.children.add(rightSibling.children.get(0));
                     rightSibling.children.remove(0);
                 }
-
-                return;
-            }
-
-            if ((indexInParent > 0) && (parent.children.get(indexInParent - 1).keys.size() > MINIMUM_NUMBER_OF_KEYS_IN_A_NODE)) {
+            } else if ((indexInParent > 0) && (parent.children.get(indexInParent - 1).keys.size() > MINIMUM_NUMBER_OF_KEYS_IN_A_NODE)) {
                 --indexInParent;
 
                 BTreeNode leftSibling = parent.children.get(indexInParent);
@@ -157,37 +153,34 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                     node.children.add(0, leftSibling.children.get(leftSibling.children.size() - 1));
                     leftSibling.children.remove(leftSibling.children.size() - 1);
                 }
-
-                return;
-            }
-
-            BTreeNode leftNode, rightNode;
-
-            if ((indexInParent + 1 < parent.children.size()) && (parent.children.get(indexInParent + 1) != node)) { //we have right sibling
-                leftNode = node; rightNode = parent.children.get(indexInParent + 1);
-            } else if ((indexInParent > 0) && (parent.children.get(0) != node)) { //we have left sibling
-                leftNode = parent.children.get(indexInParent - 1); rightNode = node;
             } else {
-                leftNode = node; rightNode = node;
-                assert false;
+                BTreeNode leftNode, rightNode;
+
+                if ((indexInParent + 1 < parent.children.size()) && (parent.children.get(indexInParent + 1) != node)) { //we have right sibling
+                    leftNode = node; rightNode = parent.children.get(indexInParent + 1);
+                } else if ((indexInParent > 0) && (parent.children.get(0) != node)) { //we have left sibling
+                    leftNode = parent.children.get(indexInParent - 1); rightNode = node;
+                } else {
+                    throw new RuntimeException("For some strange reason we don't have siblings");
+                }
+
+                if (indexInParent < parent.keys.size()) {
+                    leftNode.keys.add(parent.keys.get(indexInParent));
+                } else {
+                    leftNode.keys.add(parent.keys.get(indexInParent - 1));
+                }
+
+                leftNode.keys.addAll(rightNode.keys);
+                leftNode.children.addAll(rightNode.children.stream().peek(x -> x.parent = leftNode).collect(Collectors.toList()));
+
+                if (indexInParent == parent.keys.size()) {
+                    --indexInParent;
+                }
+
+                parent.children.remove(indexInParent + 1);
+                parent.keys.remove(indexInParent);
+                rebalanceAfterRemoval(node.parent, exSeparator);
             }
-
-            if (indexInParent < parent.keys.size()) {
-                leftNode.keys.add(parent.keys.get(indexInParent));
-            } else {
-                leftNode.keys.add(parent.keys.get(indexInParent - 1));
-            }
-
-            leftNode.keys.addAll(rightNode.keys);
-            leftNode.children.addAll(rightNode.children.stream().peek(x -> x.parent = leftNode).collect(Collectors.toList()));
-
-            if (indexInParent == parent.keys.size()) {
-                --indexInParent;
-            }
-
-            parent.children.remove(indexInParent + 1);
-            parent.keys.remove(indexInParent);
-            rebalanceAfterRemoval(node.parent, exSeparator);
         }
     }
 
