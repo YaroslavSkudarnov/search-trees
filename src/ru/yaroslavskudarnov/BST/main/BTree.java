@@ -91,7 +91,7 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                 E replacement = leafWithReplacement.keys.get(0);
                 node.keys.set(index, replacement);
                 leafWithReplacement.keys.remove(0);
-                rebalanceAfterRemoval(leafWithReplacement, replacement); //TODO: replacement now is in the parent of that leaf. how do we handle this? test it.
+                rebalanceAfterRemoval(leafWithReplacement, replacement);
             }
 
             return true;
@@ -209,8 +209,6 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
     private boolean addToSubtree(E e, BTreeNode node) {
         int index = getAppropriateIndex(e, node);
 
-        //check ranges?
-
         if ((index < node.keys.size()) && (node.keys.get(index).compareTo(e) == 0)) {
             return false;
         } else {
@@ -239,7 +237,7 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
             }
 
             List<BTreeNode> firstChildren = new ArrayList<>(), secondChildren = new ArrayList<>();
-            if (!node.children.isEmpty()) { //TODO: recheck this maybe?
+            if (!node.children.isEmpty()) {
                 for (int i = 0; i < node.children.size() / 2; ++i) {
                     firstChildren.add(node.children.get(i));
                 }
