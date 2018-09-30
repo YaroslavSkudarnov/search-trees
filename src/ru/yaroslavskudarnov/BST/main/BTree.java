@@ -256,7 +256,6 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                 childNode.parent = secondHalf;
             }
 
-
             if (node.parent != null) {
                 int indexOfCurrentNodeInParent = getAppropriateIndex(middleKey, node.parent);
 
