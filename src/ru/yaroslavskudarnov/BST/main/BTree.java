@@ -128,14 +128,15 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
             if ((indexInParent + 1 < parent.children.size()) && (parent.children.get(indexInParent + 1).keys.size() > MINIMUM_NUMBER_OF_KEYS_IN_A_NODE)) {
                 BTreeNode rightSibling = parent.children.get(indexInParent + 1);
 
-                node.keys.add(exSeparator);
                 if (indexInParent == parent.keys.size()) {
                     --indexInParent;
                 }
+                node.keys.add(parent.keys.get(indexInParent));
                 parent.keys.set(indexInParent, rightSibling.keys.get(0));
                 rightSibling.keys.remove(0);
 
                 if (!rightSibling.children.isEmpty()) {
+                    rightSibling.children.get(0).parent = node;
                     node.children.add(rightSibling.children.get(0));
                     rightSibling.children.remove(0);
                 }
@@ -144,17 +145,16 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
             }
 
             if ((indexInParent > 0) && (parent.children.get(indexInParent - 1).keys.size() > MINIMUM_NUMBER_OF_KEYS_IN_A_NODE)) {
-                BTreeNode leftSibling = parent.children.get(indexInParent - 1);
+                --indexInParent;
 
-                node.keys.add(exSeparator);
-                if (indexInParent == parent.keys.size()) {
-                    --indexInParent;
-                }
+                BTreeNode leftSibling = parent.children.get(indexInParent);
+                node.keys.add(0, parent.keys.get(indexInParent));
                 parent.keys.set(indexInParent, leftSibling.keys.get(leftSibling.keys.size() - 1));
                 leftSibling.keys.remove(leftSibling.keys.size() - 1);
 
                 if (!leftSibling.children.isEmpty()) {
-                    node.children.add(leftSibling.children.get(leftSibling.children.size() - 1));
+                    leftSibling.children.get(leftSibling.children.size() - 1).parent = node;
+                    node.children.add(0, leftSibling.children.get(leftSibling.children.size() - 1));
                     leftSibling.children.remove(leftSibling.children.size() - 1);
                 }
 
@@ -172,12 +172,19 @@ public class BTree<E extends Comparable<? super E>> extends SearchTree<E> {
                 assert false;
             }
 
-            leftNode.keys.add(exSeparator);
+            if (indexInParent < parent.keys.size()) {
+                leftNode.keys.add(parent.keys.get(indexInParent));
+            } else {
+                leftNode.keys.add(parent.keys.get(indexInParent - 1));
+            }
+
             leftNode.keys.addAll(rightNode.keys);
             leftNode.children.addAll(rightNode.children.stream().peek(x -> x.parent = leftNode).collect(Collectors.toList()));
-            if ((exSeparator.equals(removedElement) || (indexInParent == parent.keys.size()))) {
+
+            if (indexInParent == parent.keys.size()) {
                 --indexInParent;
             }
+
             parent.children.remove(indexInParent + 1);
             parent.keys.remove(indexInParent);
             rebalanceAfterRemoval(node.parent, exSeparator);
