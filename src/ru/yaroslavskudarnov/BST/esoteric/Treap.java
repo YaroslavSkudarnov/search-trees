@@ -1,6 +1,5 @@
 package ru.yaroslavskudarnov.BST.esoteric;
 
-import ru.yaroslavskudarnov.BST.classic.SimpleBinarySearchTree;
 import ru.yaroslavskudarnov.BST.core.BinarySearchTree;
 
 import java.util.Random;
