@@ -26,13 +26,8 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
     }
 
     @Override
-    public boolean add(E e) {
-        if (isEmpty()) {
-            root = initFirstNode(e);
-            return true;
-        } else {
-            return addToSubtree(new TreapNode(e), root);
-        }
+    protected boolean addToSubtree(E e, TreapNode node) {
+        return addToSubtree(new TreapNode(e), node);
     }
 
     private boolean addToSubtree(TreapNode newNode, TreapNode currentNode) {
@@ -57,7 +52,7 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
                 }
             }
         } else if (newNode.priority == currentNode.priority) {
-            return addToSubtree(new TreapNode(newNode.payload), root);
+            return addToSubtree(newNode.payload, root);
         } else {
 
         }
