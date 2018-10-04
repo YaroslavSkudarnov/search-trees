@@ -12,12 +12,49 @@ import java.util.Random;
 public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, Treap<E>.TreapNode> {
     private Random randomizer;
 
+    class SplitResults { //It's hard to overstate my hatred for lack of proper pairs in Java
+        TreapNode rootOfAFirstSubtree, rootOfASecondSubtree;
+
+        SplitResults(TreapNode rootOfAFirstSubtree, TreapNode rootOfASecondSubtree) {
+            this.rootOfAFirstSubtree = rootOfAFirstSubtree;
+            this.rootOfASecondSubtree = rootOfASecondSubtree;
+        }
+
+        SplitResults() {
+            this(null, null);
+        }
+    }
+
+    private SplitResults split(TreapNode node, E key) {
+        if (node == null) {
+            return new SplitResults();
+        }
+
+        if (node.payload.compareTo(key) > 0) {
+            SplitResults splitRightSubtree = split(node.right, key);
+            node.right = splitRightSubtree.rootOfAFirstSubtree;
+            return new SplitResults(node, splitRightSubtree.rootOfASecondSubtree);
+        } else if (node.payload.compareTo(key) < 0) {
+            SplitResults splitLeftSubtree = split(node.left, key);
+            node.left = splitLeftSubtree.rootOfASecondSubtree;
+            return new SplitResults(splitLeftSubtree.rootOfAFirstSubtree, node);
+        } else {
+            return new SplitResults(node.left, node.right);
+        }
+    }
+
     class TreapNode extends BinarySearchTree<E, TreapNode>.BinarySearchTreeNode {
         private long priority;
 
         TreapNode(E e) {
             super(e);
             priority = randomizer.nextLong();
+        }
+
+        @Override
+        protected void replaceContent(TreapNode replacement) {
+            priority = replacement.priority;
+            super.replaceContent(replacement);
         }
     }
 
@@ -54,7 +91,11 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
         } else if (newNode.priority == currentNode.priority) {
             return addToSubtree(newNode.payload, root);
         } else {
+            SplitResults splitCurrentNode = split(currentNode, newNode.payload);
+            newNode.left = splitCurrentNode.rootOfAFirstSubtree; newNode.right = splitCurrentNode.rootOfASecondSubtree;
 
+            updateLinks(currentNode, currentNode.parent, newNode);
+            return true;
         }
     }
 
@@ -63,5 +104,8 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
         return new TreapNode(e);
     }
 
-
+    @Override
+    protected boolean removeFromSubtree(E e, TreapNode node) {
+        return false;
+    }
 }
