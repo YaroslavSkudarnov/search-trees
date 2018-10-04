@@ -1,6 +1,7 @@
 package ru.yaroslavskudarnov.BST.test.classic;
 
 import ru.yaroslavskudarnov.BST.classic.AVLTree;
+import ru.yaroslavskudarnov.BST.test.GeneralSearchTreesTest;
 
 /**
  * User: Skudarnov Yaroslav
