@@ -49,6 +49,26 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
         }
     }
 
+    private TreapNode merge(TreapNode leftSubtree, TreapNode rightSubtree) {
+        if (leftSubtree == null) {
+            return rightSubtree;
+        }
+
+        if (rightSubtree == null) {
+            return leftSubtree;
+        }
+
+        if (leftSubtree.priority < rightSubtree.priority) {
+            leftSubtree.right = merge(leftSubtree.right, rightSubtree);
+            leftSubtree.right.parent = leftSubtree;
+            return leftSubtree;
+        } else {
+            rightSubtree.left = merge(rightSubtree.left, leftSubtree);
+            rightSubtree.left.parent = rightSubtree;
+            return rightSubtree;
+        }
+    }
+
     class TreapNode extends BinarySearchTree<E, TreapNode>.BinarySearchTreeNode {
         private long priority;
 
@@ -130,6 +150,29 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
 
     @Override
     protected boolean removeFromSubtree(E e, TreapNode node) {
-        return false;
+        int compare = node.compareTo(e);
+
+        TreapNode parent = node.parent;
+
+        if (compare == 0) {
+            TreapNode newRootOfSubtree = merge(node.left, node.right);
+            checkNullAndSetParent(newRootOfSubtree, parent);
+
+            if (parent == null) {
+                root = newRootOfSubtree;
+            } else {
+                if (parent.payload.compareTo(e) > 0) {
+                    parent.left = newRootOfSubtree;
+                } else {
+                    parent.right = newRootOfSubtree;
+                }
+            }
+
+            return true;
+        } else if (compare < 0) {
+            return node.right != null && removeFromSubtree(e, node.right);
+        } else {
+            return node.left != null && removeFromSubtree(e, node.left);
+        }
     }
 }
