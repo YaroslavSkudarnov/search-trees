@@ -30,13 +30,19 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
             return new SplitResults();
         }
 
-        if (node.payload.compareTo(key) > 0) {
+        if (node.payload.compareTo(key) < 0) {
             SplitResults splitRightSubtree = split(node.right, key);
             node.right = splitRightSubtree.rootOfAFirstSubtree;
+            if (splitRightSubtree.rootOfAFirstSubtree != null) {
+                splitRightSubtree.rootOfAFirstSubtree.parent = node;
+            }
             return new SplitResults(node, splitRightSubtree.rootOfASecondSubtree);
-        } else if (node.payload.compareTo(key) < 0) {
+        } else if (node.payload.compareTo(key) > 0) {
             SplitResults splitLeftSubtree = split(node.left, key);
             node.left = splitLeftSubtree.rootOfASecondSubtree;
+            if (splitLeftSubtree.rootOfASecondSubtree != null) {
+                splitLeftSubtree.rootOfASecondSubtree.parent = node;
+            }
             return new SplitResults(splitLeftSubtree.rootOfAFirstSubtree, node);
         } else {
             return new SplitResults(node.left, node.right);
@@ -76,6 +82,7 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
             } else if (compare < 0) {
                 if (currentNode.right == null) {
                     currentNode.right = newNode;
+                    newNode.parent = currentNode;
                     return true;
                 } else {
                     return addToSubtree(newNode, currentNode.right);
@@ -83,6 +90,7 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
             } else {
                 if (currentNode.left == null) {
                     currentNode.left = newNode;
+                    newNode.parent = currentNode;
                     return true;
                 } else {
                     return addToSubtree(newNode, currentNode.left);
@@ -91,10 +99,26 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
         } else if (newNode.priority == currentNode.priority) {
             return addToSubtree(newNode.payload, root);
         } else {
+            if (subtreeContains(newNode.payload, currentNode)) {
+                return false;
+            }
+
+            newNode.parent = currentNode.parent;
+
             SplitResults splitCurrentNode = split(currentNode, newNode.payload);
             newNode.left = splitCurrentNode.rootOfAFirstSubtree; newNode.right = splitCurrentNode.rootOfASecondSubtree;
 
-            updateLinks(currentNode, currentNode.parent, newNode);
+            if (newNode.parent == null) {
+                root = newNode;
+            } else {
+                if (newNode.parent.payload.compareTo(newNode.payload) > 0) {
+                    newNode.parent.left = newNode;
+                } else {
+                    newNode.parent.right = newNode;
+                }
+            }
+            checkNullAndSetParent(newNode.left, newNode);
+            checkNullAndSetParent(newNode.right, newNode);
             return true;
         }
     }

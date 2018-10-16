@@ -130,7 +130,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         }
     }
 
-    private boolean subtreeContains(E e, N node) {
+    protected boolean subtreeContains(E e, N node) {
         int compare = node.compareTo(e);
 
         if (compare == 0) {
