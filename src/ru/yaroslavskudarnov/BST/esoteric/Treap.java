@@ -63,7 +63,7 @@ public class Treap<E extends Comparable<? super E>> extends BinarySearchTree<E, 
             leftSubtree.right.parent = leftSubtree;
             return leftSubtree;
         } else {
-            rightSubtree.left = merge(rightSubtree.left, leftSubtree);
+            rightSubtree.left = merge(leftSubtree, rightSubtree.left);
             rightSubtree.left.parent = rightSubtree;
             return rightSubtree;
         }
