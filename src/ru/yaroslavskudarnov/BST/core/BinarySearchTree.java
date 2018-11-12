@@ -213,9 +213,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         pullNewRootUpAndUpdateLinksToParents(node, newSubRoot);
 
         node.right = newSubRoot.left;
-        if (node.right != null) {
-            node.right.parent = node;
-        }
+        checkNullAndSetParent(node.right, node);
         newSubRoot.left = node;
     }
 
@@ -225,9 +223,7 @@ public abstract class BinarySearchTree<E extends Comparable<? super E>, N extend
         pullNewRootUpAndUpdateLinksToParents(node, newSubRoot);
 
         node.left = newSubRoot.right;
-        if (node.left != null) {
-            node.left.parent = node;
-        }
+        checkNullAndSetParent(node.left, node);
         newSubRoot.right = node;
     }
 
