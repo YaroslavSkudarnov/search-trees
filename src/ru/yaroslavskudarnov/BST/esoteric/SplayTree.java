@@ -107,38 +107,28 @@ public class SplayTree<E extends Comparable<? super E>> extends BinarySearchTree
     protected boolean removeFromSubtree(E e, SplayTreeNode node) {
         int compare = node.compareTo(e);
 
-        SplayTreeNode parent = node.parent;
-
         if (compare == 0) {
-            SplayTreeNode replacement;
-
-            if (node.left == null) {
-                replacement = node.right;
-            } else {
-                if (node.right == null) {
-                    replacement = node.left;
-                } else {
-                    replacement = getNext(node);
-
-                    if (replacement == null) {
-                        replacement = getPrevious(node);
-                    }
-
-                    remove(replacement.payload);
-                    replacement.left = node.left; replacement.right = node.right;
-                }
-            }
-
-            updateLinks(node, parent, replacement);
-            if (parent != null) {
-                splay(parent);
-            }
+            splay(node);
+            merge(node.left, node.right);
 
             return true;
         } else if (compare < 0) {
             return node.right != null && removeFromSubtree(e, node.right);
         } else {
             return node.left != null && removeFromSubtree(e, node.left);
+        }
+    }
+
+    private void merge(SplayTreeNode leftSubtree, SplayTreeNode rightSubtree) {
+        SplayTreeNode newRoot = leftmostDescendant(rightSubtree);
+
+        if (newRoot != null) {
+            splay(newRoot);
+            newRoot.left = leftSubtree;
+            checkNullAndSetParent(leftSubtree, newRoot);
+        } else {
+            root = leftSubtree;
+            checkNullAndSetParent(leftSubtree, null);
         }
     }
 }
