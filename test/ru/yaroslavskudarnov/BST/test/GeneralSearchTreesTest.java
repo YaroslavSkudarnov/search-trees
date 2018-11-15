@@ -113,7 +113,7 @@ public abstract class GeneralSearchTreesTest<T extends SearchTree<Integer>> {
 
         for (int i = 1; i <= 20; ++i) {
             TestResults results = randomTest(5, i * 10000);
-            System.out.println("all the insertions and removals in big tests with " + i * 10000 + " elements took " + results.timeElapsed + " milliseconds!");
+            System.out.println("all the insertions and removals in big tests with " + i * 10000 + " elements took " + results.timeElapsed + " milliseconds");
             System.out.println("insertions: " + results.insertionsTime + " ms, removals: " + results.removalsTime + " ms, checks: " + results.checksTime + "ms");
         }
     }
